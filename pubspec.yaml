@@ -1,0 +1,23 @@
+name: purchases_dart
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  dio_smart_retry: ^6.0.0
+  dio_cache_interceptor: ^3.5.0
+  purchases_flutter: ^6.0.0
+  collection: ^1.18.0
+  
+dev_dependencies:
+  lints: ^2.1.0
+  test: ^1.24.0
+
+
+
