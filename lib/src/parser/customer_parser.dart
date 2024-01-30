@@ -8,10 +8,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Parses a [RawCustomer] into a [CustomerInfo] object.
 class CustomerParser {
-  Future<CustomerInfo?> createCustomer(
-    RawCustomer rawCustomer,
-    String requestDate,
-  ) async {
+  CustomerInfo? createCustomer(RawCustomer rawCustomer) {
     List<RawSubscriptionObject> subscriptions = rawCustomer.subscriptions ?? [];
     List<RawSubscriptionObject> nonSubscriptionsLatestPurchases =
         rawCustomer.nonSubscriptionsLatestPurchases ?? [];
@@ -29,7 +26,7 @@ class CustomerParser {
     EntitlementInfos entitlements = _createEntitlementInfos(
       entitlements: rawEntitlements,
       subscriptions: allSubscriptions,
-      requestDate: requestDate,
+      requestDate: rawCustomer.requestDate,
     );
     String firstSeen = rawCustomer.firstSeen?.toString() ?? "";
     String originalAppUserId = rawCustomer.originalAppUserId ?? "";
@@ -52,7 +49,7 @@ class CustomerParser {
 
       if (_isDateActive(
         subscriptionObject.identifier,
-        requestDate,
+        rawCustomer.requestDate,
         subscriptionObject.expiresDate,
       )) {
         activeSubscriptions.add(subscriptionObject.identifier);
@@ -76,7 +73,7 @@ class CustomerParser {
       firstSeen,
       originalAppUserId,
       allExpirationDates,
-      requestDate,
+      rawCustomer.requestDate,
       latestExpirationDate: null,
       originalPurchaseDate: rawCustomer.originalPurchaseDate?.toString(),
       originalApplicationVersion:

@@ -47,17 +47,31 @@ class _MainAppState extends State<MainApp> {
     return data;
   }
 
+  // TestStripeCard: 4242 4242 4242 4242
   @override
   void initState() {
-    // TestStripeCard: 4242 4242 4242 4242
-    PurchasesDart.setup(
-      apiKey: env.revenueCatApiKey,
-      storeProduct: StripeStoreProduct(
-        stripeApi: env.stripeApiKey,
-        checkoutSessionsBuilder: _buildStripeCheckoutData,
-        onCheckoutUrlGenerated: launchUrlString,
+    // use stripe storeProductInterface
+    StoreProductInterface storeProduct = StripeStoreProduct(
+      stripeApi: env.stripeApiKey,
+      checkoutSessionsBuilder: _buildStripeCheckoutData,
+      onCheckoutUrlGenerated: (String sessionId, String url) =>
+          launchUrlString(url),
+    );
+
+    // configure PurchasesDart
+    PurchasesDart.configure(
+      PurchasesDartConfiguration(
+        apiKey: env.revenueCatApiKey,
+        appUserId: userId,
+        storeProduct: storeProduct,
       ),
     );
+
+    // add customerInfoUpdateListener
+    PurchasesDart.addCustomerInfoUpdateListener((customerInfo) {
+      print("CustomerInfoUpdateListener");
+      print(customerInfo.toJson());
+    });
     super.initState();
   }
 
@@ -66,7 +80,7 @@ class _MainAppState extends State<MainApp> {
       isLoading = true;
     });
     try {
-      CustomerInfo? customerInfo = await PurchasesDart.getCustomerInfo(userId);
+      CustomerInfo? customerInfo = await PurchasesDart.getCustomerInfo();
       print(customerInfo?.toJson());
       setState(() {
         isLoading = false;
@@ -85,7 +99,7 @@ class _MainAppState extends State<MainApp> {
       isLoading = true;
     });
     try {
-      Offerings? offerings = await PurchasesDart.getOfferings(userId);
+      Offerings? offerings = await PurchasesDart.getOfferings();
       print(offerings?.toJson());
       setState(() {
         this.offerings = offerings;
@@ -104,7 +118,7 @@ class _MainAppState extends State<MainApp> {
       isLoading = true;
     });
     try {
-      await PurchasesDart.purchasePackage(package, userId);
+      await PurchasesDart.purchasePackage(package);
       setState(() {
         isLoading = false;
       });

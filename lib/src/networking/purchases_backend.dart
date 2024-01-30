@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:purchases_dart/src/helper/response_json_keys.dart';
 import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/networking/api_service.dart';
@@ -26,12 +25,7 @@ class PurchasesBackend {
 
   Future<CustomerInfo?> getCustomerInfo(String userId) async {
     final response = await _httpClient.get(GetCustomerInfo(userId).path);
-    return _customerParser.createCustomer(
-      RawCustomer.fromJson(
-        response.data[CustomerInfoResponseJsonKeys.subscriber],
-      ),
-      response.data[CustomerInfoResponseJsonKeys.requestDate],
-    );
+    return _customerParser.createCustomer(RawCustomer.fromJson(response.data));
   }
 
   Future<Offerings?> getOfferings(String userId) async {

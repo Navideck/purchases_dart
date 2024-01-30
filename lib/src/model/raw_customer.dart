@@ -1,5 +1,6 @@
 class RawCustomer {
   RawCustomer({
+    required this.requestDate,
     required this.entitlements,
     required this.firstSeen,
     required this.lastSeen,
@@ -13,6 +14,7 @@ class RawCustomer {
     required this.subscriptions,
   });
 
+  final String requestDate;
   final List<RawEntitlementObject>? entitlements;
   final DateTime? firstSeen;
   final DateTime? lastSeen;
@@ -25,8 +27,10 @@ class RawCustomer {
   final dynamic originalApplicationVersion;
   final dynamic originalPurchaseDate;
 
-  factory RawCustomer.fromJson(Map<String, dynamic> json) {
+  factory RawCustomer.fromJson(Map<String, dynamic> rawJson) {
+    Map<String, dynamic> json = rawJson["subscriber"];
     return RawCustomer(
+      requestDate: rawJson["request_date"] ?? "",
       entitlements: entitlementsFromJson(json["entitlements"]),
       firstSeen: DateTime.tryParse(json["first_seen"] ?? ""),
       lastSeen: DateTime.tryParse(json["last_seen"] ?? ""),
@@ -43,6 +47,7 @@ class RawCustomer {
   }
 
   Map<String, dynamic> toJson() => {
+        "request_date": requestDate,
         "entitlements": entitlements?.map((e) => e.toJson()),
         "first_seen": firstSeen?.toIso8601String(),
         "last_seen": lastSeen?.toIso8601String(),

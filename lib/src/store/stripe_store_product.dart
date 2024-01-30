@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:purchases_dart/src/helper/log_helper.dart';
 import 'package:purchases_dart/src/model/stripe_customer.dart';
@@ -6,21 +7,14 @@ import 'package:purchases_dart/src/model/stripe_currency.dart';
 import 'package:purchases_dart/src/model/stripe_price.dart';
 import 'package:purchases_dart/src/model/stripe_product.dart';
 import 'package:purchases_dart/src/store/store_product_interface.dart';
-import 'package:purchases_flutter/models/package_wrapper.dart';
-import 'package:purchases_flutter/models/store_product_wrapper.dart';
-import 'package:purchases_flutter/models/store_transaction.dart';
-
-typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
-  String stripePriceId,
-  Package package,
-);
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 class StripeStoreProduct extends StoreProductInterface {
   late Dio _httpClient;
   StripeCurrencyFormatter? currencyFormatter;
-  final Map<String, StripeCustomer> _stripeCustomers = {};
+  final List<_StripeCustomerCache> _stripeCustomers = [];
   CheckoutSessionsBuilder? checkoutSessionsBuilder;
-  Function(String url)? onCheckoutUrlGenerated;
+  Function(String sessionId, String url)? onCheckoutUrlGenerated;
 
   StripeStoreProduct({
     required String stripeApi,
@@ -102,11 +96,13 @@ class StripeStoreProduct extends StoreProductInterface {
       '/checkout/sessions',
       data: data,
     );
+
     String? url = checkoutSessionResponse.data?['url'];
-    if (url == null) {
+    String? sessionId = checkoutSessionResponse.data?['id'];
+    if (url == null || sessionId == null) {
       throw Exception('Failed to generate checkout url');
     }
-    onCheckoutUrlGenerated?.call(url);
+    onCheckoutUrlGenerated?.call(sessionId, url);
   }
 
   /// Helpers
@@ -129,9 +125,15 @@ class StripeStoreProduct extends StoreProductInterface {
 
   /// Get StripeCustomer from Stripe API linked with [userId]
   Future<StripeCustomer?> _getStripeCustomer(String userId) async {
-    if (_stripeCustomers.containsKey(userId)) {
-      return _stripeCustomers[userId];
+    _StripeCustomerCache? cacheCustomer = _stripeCustomers
+        .firstWhereOrNull((element) => element.userId == userId);
+    if (cacheCustomer != null && !cacheCustomer.isExpired()) {
+      return cacheCustomer.stripeCustomer;
     }
+    if (cacheCustomer?.isExpired() == true) {
+      _stripeCustomers.remove(cacheCustomer);
+    }
+
     final customers = await _httpClient.get(
       '/customers/search',
       data: {
@@ -150,7 +152,7 @@ class StripeStoreProduct extends StoreProductInterface {
       }
       stripeCustomer = StripeCustomer.fromJson(customersData.first);
     }
-    _stripeCustomers[userId] = stripeCustomer;
+    _stripeCustomers.add(_StripeCustomerCache(userId, stripeCustomer));
     return stripeCustomer;
   }
 
@@ -160,5 +162,19 @@ class StripeStoreProduct extends StoreProductInterface {
       "metadata": {"uid": userId}
     });
     return StripeCustomer.fromJson(response.data);
+  }
+}
+
+class _StripeCustomerCache {
+  String userId;
+  StripeCustomer? stripeCustomer;
+  late DateTime createdAt;
+  _StripeCustomerCache(this.userId, this.stripeCustomer) {
+    createdAt = DateTime.now();
+  }
+
+  // Expire cache after 2 minutes
+  bool isExpired() {
+    return DateTime.now().difference(createdAt).inMinutes > 2;
   }
 }
