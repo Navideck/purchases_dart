@@ -5,6 +5,7 @@ class RawCustomer {
     required this.lastSeen,
     required this.managementUrl,
     required this.nonSubscriptions,
+    required this.nonSubscriptionsLatestPurchases,
     required this.originalAppUserId,
     required this.originalApplicationVersion,
     required this.originalPurchaseDate,
@@ -15,9 +16,10 @@ class RawCustomer {
   final List<RawEntitlementObject>? entitlements;
   final DateTime? firstSeen;
   final DateTime? lastSeen;
-  final Map<String, dynamic>? nonSubscriptions;
+  final List<RawSubscriptionObject>? nonSubscriptions;
+  final List<RawSubscriptionObject>? nonSubscriptionsLatestPurchases;
   final String? originalAppUserId;
-  final Map<String, dynamic>? otherPurchases;
+  final List<RawSubscriptionObject>? otherPurchases;
   final List<RawSubscriptionObject>? subscriptions;
   final String? managementUrl;
   final dynamic originalApplicationVersion;
@@ -25,20 +27,18 @@ class RawCustomer {
 
   factory RawCustomer.fromJson(Map<String, dynamic> json) {
     return RawCustomer(
-      entitlements: json["entitlements"] == null
-          ? null
-          : entitlementsFromJson(json["entitlements"]),
+      entitlements: entitlementsFromJson(json["entitlements"]),
       firstSeen: DateTime.tryParse(json["first_seen"] ?? ""),
       lastSeen: DateTime.tryParse(json["last_seen"] ?? ""),
       managementUrl: json["management_url"],
-      nonSubscriptions: json["non_subscriptions"] ?? {},
       originalAppUserId: json["original_app_user_id"],
       originalApplicationVersion: json["original_application_version"],
       originalPurchaseDate: json["original_purchase_date"],
-      otherPurchases: json["other_purchases"] ?? {},
-      subscriptions: json["subscriptions"] == null
-          ? null
-          : subscriptionsFromJson(json["subscriptions"]),
+      nonSubscriptions: nonSubscriptionsFromJson(json["non_subscriptions"]),
+      nonSubscriptionsLatestPurchases:
+          nonSubscriptionsFromJson(json["non_subscriptions"], true),
+      otherPurchases: subscriptionsFromJson(json["other_purchases"]),
+      subscriptions: subscriptionsFromJson(json["subscriptions"]),
     );
   }
 
@@ -56,18 +56,37 @@ class RawCustomer {
       };
 }
 
-List<RawEntitlementObject> entitlementsFromJson(Map<String, dynamic> json) {
+List<RawEntitlementObject> entitlementsFromJson(Map<String, dynamic>? json) {
   List<RawEntitlementObject> result = [];
-  json.forEach((key, value) {
+  json?.forEach((key, value) {
     result.add(RawEntitlementObject.fromJson(key, value));
   });
   return result;
 }
 
-List<RawSubscriptionObject> subscriptionsFromJson(Map<String, dynamic> json) {
+List<RawSubscriptionObject> subscriptionsFromJson(Map<String, dynamic>? json) {
   List<RawSubscriptionObject> result = [];
-  json.forEach((key, value) {
+  json?.forEach((key, value) {
     result.add(RawSubscriptionObject.fromJson(key, value));
+  });
+  return result;
+}
+
+List<RawSubscriptionObject> nonSubscriptionsFromJson(
+  Map<String, dynamic>? json, [
+  bool onlyLatestPurchases = false,
+]) {
+  List<RawSubscriptionObject> result = [];
+  json?.forEach((key, value) {
+    List<RawSubscriptionObject> values =
+        List<RawSubscriptionObject>.from(value.map(
+      (e) => RawSubscriptionObject.fromJson(key, e),
+    ));
+    if (onlyLatestPurchases) {
+      result.add(values.last);
+    } else {
+      result.addAll(values);
+    }
   });
   return result;
 }
@@ -108,6 +127,7 @@ class RawEntitlementObject {
 class RawSubscriptionObject {
   RawSubscriptionObject({
     required this.id,
+    required this.identifier,
     required this.autoResumeDate,
     required this.billingIssuesDetectedAt,
     required this.expiresDate,
@@ -122,7 +142,8 @@ class RawSubscriptionObject {
     required this.unsubscribeDetectedAt,
   });
 
-  final String id;
+  final String? id;
+  final String identifier;
   final dynamic autoResumeDate;
   final dynamic billingIssuesDetectedAt;
   final DateTime? expiresDate;
@@ -136,9 +157,11 @@ class RawSubscriptionObject {
   final String? storeTransactionId;
   final dynamic unsubscribeDetectedAt;
 
-  factory RawSubscriptionObject.fromJson(String id, Map<String, dynamic> json) {
+  factory RawSubscriptionObject.fromJson(
+      String key, Map<String, dynamic> json) {
     return RawSubscriptionObject(
-      id: id,
+      identifier: key,
+      id: json["id"],
       autoResumeDate: json["auto_resume_date"],
       billingIssuesDetectedAt: json["billing_issues_detected_at"],
       expiresDate: DateTime.tryParse(json["expires_date"] ?? ""),
@@ -156,7 +179,7 @@ class RawSubscriptionObject {
   }
 
   Map<String, dynamic> toJson() => {
-        "id": id,
+        "identifier": identifier,
         "auto_resume_date": autoResumeDate,
         "billing_issues_detected_at": billingIssuesDetectedAt,
         "expires_date": expiresDate?.toIso8601String(),

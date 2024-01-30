@@ -8,6 +8,7 @@ class PurchasesDart {
   static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
       {};
   static CustomerInfo? _lastReceivedCustomerInfo;
+  static late StoreProductInterface _storeProduct;
 
   /// Set cache options for requests,
   /// see https://pub.dev/packages/dio_cache_interceptor#cache-options
@@ -28,6 +29,7 @@ class PurchasesDart {
       apiKey: apiKey,
       storeProduct: storeProduct,
     );
+    _storeProduct = storeProduct;
   }
 
   /// Not implemented yet
@@ -60,6 +62,14 @@ class PurchasesDart {
   static Future<void> syncPurchases(String userId) async {
     _validateSetup();
     return await _backend?.syncPurchases(userId);
+  }
+
+  static Future purchasePackage(
+    Package packageToPurchase,
+    String userId,
+  ) async {
+    _validateSetup();
+    return await _storeProduct.purchasePackage(packageToPurchase, userId);
   }
 
   /// TODO: implement this

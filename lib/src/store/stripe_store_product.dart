@@ -6,16 +6,27 @@ import 'package:purchases_dart/src/model/stripe_currency.dart';
 import 'package:purchases_dart/src/model/stripe_price.dart';
 import 'package:purchases_dart/src/model/stripe_product.dart';
 import 'package:purchases_dart/src/store/store_product_interface.dart';
+import 'package:purchases_flutter/models/package_wrapper.dart';
 import 'package:purchases_flutter/models/store_product_wrapper.dart';
 import 'package:purchases_flutter/models/store_transaction.dart';
+
+typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
+  String stripePriceId,
+  Package package,
+);
 
 class StripeStoreProduct extends StoreProductInterface {
   late Dio _httpClient;
   StripeCurrencyFormatter? currencyFormatter;
   final Map<String, StripeCustomer> _stripeCustomers = {};
+  CheckoutSessionsBuilder? checkoutSessionsBuilder;
+  Function(String url)? onCheckoutUrlGenerated;
+
   StripeStoreProduct({
     required String stripeApi,
+    this.checkoutSessionsBuilder,
     this.currencyFormatter,
+    this.onCheckoutUrlGenerated,
   }) {
     _httpClient = ApiService.getStripeHttpClient(stripeApi);
   }
@@ -43,6 +54,7 @@ class StripeStoreProduct extends StoreProductInterface {
       stripeCurrency.amount,
       stripeCurrency.formattedPrice,
       stripeCurrency.currency,
+      presentedOfferingIdentifier: stripeProduct.defaultPrice,
     );
   }
 
@@ -61,6 +73,45 @@ class StripeStoreProduct extends StoreProductInterface {
     return [];
   }
 
+  @override
+  Future purchasePackage(
+    Package packageToPurchase,
+    String userId,
+  ) async {
+    CheckoutSessionsBuilder? checkoutSessionsBuilder =
+        this.checkoutSessionsBuilder;
+    if (checkoutSessionsBuilder == null) {
+      throw Exception('checkoutSessionsBuilder is null');
+    }
+    String? priceId =
+        packageToPurchase.storeProduct.presentedOfferingIdentifier;
+    if (priceId == null) {
+      throw Exception('Stripe priceId not found');
+    }
+    StripeCustomer? stripeCustomer = await _getStripeCustomer(userId);
+    if (stripeCustomer == null) {
+      throw Exception('StripeCustomer not found for $userId');
+    }
+    Map<String, dynamic> data = await checkoutSessionsBuilder(
+      priceId,
+      packageToPurchase,
+    );
+    data['customer'] = stripeCustomer.id;
+    data['client_reference_id'] = userId;
+    final checkoutSessionResponse = await _httpClient.post(
+      '/checkout/sessions',
+      data: data,
+    );
+    String? url = checkoutSessionResponse.data?['url'];
+    if (url == null) {
+      throw Exception('Failed to generate checkout url');
+    }
+    onCheckoutUrlGenerated?.call(url);
+  }
+
+  /// Helpers
+  ///
+  /// Get StripeProduct from Stripe API
   Future<StripeProduct?> _getStripeProduct(String productId) async {
     final productResponse = await _httpClient.get('/products/$productId');
     var productsJson = productResponse.data;
@@ -68,6 +119,7 @@ class StripeStoreProduct extends StoreProductInterface {
     return StripeProduct.fromJson(productsJson);
   }
 
+  /// Get StripePrice from Stripe API
   Future<StripePrice?> _getStripePrice(String priceId) async {
     final priceResponse = await _httpClient.get('/prices/$priceId');
     var priceJson = priceResponse.data;
@@ -75,6 +127,7 @@ class StripeStoreProduct extends StoreProductInterface {
     return StripePrice.fromJson(priceJson);
   }
 
+  /// Get StripeCustomer from Stripe API linked with [userId]
   Future<StripeCustomer?> _getStripeCustomer(String userId) async {
     if (_stripeCustomers.containsKey(userId)) {
       return _stripeCustomers[userId];
@@ -101,9 +154,10 @@ class StripeStoreProduct extends StoreProductInterface {
     return stripeCustomer;
   }
 
-  Future<StripeCustomer> _createStripeCustomer(String uid) async {
+  /// Create StripeCustomer from Stripe API linked with [userId]
+  Future<StripeCustomer> _createStripeCustomer(String userId) async {
     final response = await _httpClient.post('/customers', data: {
-      "metadata": {"uid": uid}
+      "metadata": {"uid": userId}
     });
     return StripeCustomer.fromJson(response.data);
   }

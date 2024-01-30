@@ -13,6 +13,13 @@ class CustomerParser {
     String requestDate,
   ) async {
     List<RawSubscriptionObject> subscriptions = rawCustomer.subscriptions ?? [];
+    List<RawSubscriptionObject> nonSubscriptionsLatestPurchases =
+        rawCustomer.nonSubscriptionsLatestPurchases ?? [];
+    List<RawSubscriptionObject> allSubscriptions = [
+      ...nonSubscriptionsLatestPurchases,
+      ...subscriptions
+    ];
+
     List<RawEntitlementObject> rawEntitlements = rawCustomer.entitlements ?? [];
 
     Map<String, String> allPurchaseDates = {};
@@ -21,27 +28,42 @@ class CustomerParser {
     Map<String, String?> allExpirationDates = {};
     EntitlementInfos entitlements = _createEntitlementInfos(
       entitlements: rawEntitlements,
-      subscriptions: subscriptions,
+      subscriptions: allSubscriptions,
       requestDate: requestDate,
     );
     String firstSeen = rawCustomer.firstSeen?.toString() ?? "";
     String originalAppUserId = rawCustomer.originalAppUserId ?? "";
-
-    // TODO: implement this
     List<StoreTransaction> nonSubscriptionTransactions = [];
 
-    for (var subscriptionObject in subscriptions) {
-      allPurchasedProductIdentifiers.add(subscriptionObject.id);
-      allPurchaseDates[subscriptionObject.id] =
-          subscriptionObject.purchaseDate?.toString() ?? "";
-      allExpirationDates[subscriptionObject.id] =
-          subscriptionObject.expiresDate?.toString() ?? "";
+    for (var subscriptionObject in allSubscriptions) {
+      allPurchasedProductIdentifiers.add(subscriptionObject.identifier);
+
+      DateTime? purchaseDate = subscriptionObject.purchaseDate;
+      if (purchaseDate != null) {
+        allPurchaseDates[subscriptionObject.identifier] =
+            purchaseDate.toString();
+      }
+
+      DateTime? expirationDate = subscriptionObject.expiresDate;
+      if (expirationDate != null) {
+        allExpirationDates[subscriptionObject.identifier] =
+            expirationDate.toString();
+      }
+
       if (_isDateActive(
-        subscriptionObject.id,
+        subscriptionObject.identifier,
         requestDate,
         subscriptionObject.expiresDate,
       )) {
-        activeSubscriptions.add(subscriptionObject.id);
+        activeSubscriptions.add(subscriptionObject.identifier);
+      }
+    }
+
+    for (var subscriptionObject in nonSubscriptionsLatestPurchases) {
+      StoreTransaction? transaction =
+          _createStoreTransactions(subscriptionObject);
+      if (transaction != null) {
+        nonSubscriptionTransactions.add(transaction);
       }
     }
 
@@ -91,7 +113,7 @@ class CustomerParser {
     String requestDate,
   ) {
     RawSubscriptionObject? subscriptionObject = subscriptions.firstWhereOrNull(
-        (element) => element.id == entitlement.productIdentifier);
+        (element) => element.identifier == entitlement.productIdentifier);
     if (subscriptionObject == null) return null;
     return EntitlementInfo(
       entitlement.id,
@@ -146,7 +168,7 @@ class CustomerParser {
     return StoreTransaction.create(
       transactionIdentifier,
       transactionIdentifier,
-      subscriptionObject.id,
+      subscriptionObject.identifier,
       subscriptionObject.purchaseDate?.toString() ?? "",
     );
   }

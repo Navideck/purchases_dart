@@ -12,7 +12,7 @@ class ApiService {
       BaseOptions(
         baseUrl: 'https://api.revenuecat.com/v1',
         headers: {
-          'X-Platform': 'ios',
+          'X-Platform': 'stripe',
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $apiKey'
         },

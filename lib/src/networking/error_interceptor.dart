@@ -14,6 +14,13 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.receiveTimeout:
         throw ReceiveTimeOutException(err.requestOptions);
       case DioExceptionType.badResponse:
+        var responseData = err.response?.data;
+        if (responseData != null) {
+          throw DioException(
+            requestOptions: err.requestOptions,
+            error: responseData.toString(),
+          );
+        }
         switch (err.response?.statusCode) {
           case 400:
             throw BadRequestException(err.requestOptions);

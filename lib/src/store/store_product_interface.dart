@@ -1,8 +1,12 @@
-import 'package:purchases_flutter/models/store_product_wrapper.dart';
-import 'package:purchases_flutter/models/store_transaction.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 abstract class StoreProductInterface {
   Future<StoreProduct?> getStoreProducts(String productId);
 
   Future<List<StoreTransaction>> queryAllPurchases(String userId);
+
+  Future purchasePackage(
+    Package packageToPurchase,
+    String userId,
+  );
 }

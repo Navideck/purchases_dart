@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:dio/dio.dart';
 import 'package:purchases_dart/src/helper/response_json_keys.dart';
 import 'package:purchases_dart/src/model/raw_offerings.dart';
@@ -28,7 +26,6 @@ class PurchasesBackend {
 
   Future<CustomerInfo?> getCustomerInfo(String userId) async {
     final response = await _httpClient.get(GetCustomerInfo(userId).path);
-    print(response.data);
     return _customerParser.createCustomer(
       RawCustomer.fromJson(
         response.data[CustomerInfoResponseJsonKeys.subscriber],
