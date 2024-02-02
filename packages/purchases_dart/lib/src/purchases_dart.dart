@@ -1,7 +1,8 @@
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
+import 'package:purchases_dart/src/purchases_dart_configuration.dart';
+import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 typedef CustomerInfoUpdateListener = void Function(CustomerInfo customerInfo);
@@ -17,11 +18,6 @@ class PurchasesDart {
   /// Required to set [appUserId] before using any other methods
   static String? appUserId;
 
-  /// Set cache options for requests,
-  /// see https://pub.dev/packages/dio_cache_interceptor#cache-options
-  /// make sure to set this before calling [setup]
-  static CacheOptions? cacheOptions;
-
   /// call [configure] before calling any other methods
   static Future<void> configure(
     PurchasesDartConfiguration configuration,
@@ -35,10 +31,6 @@ class PurchasesDart {
     );
     _storeProduct = configuration.storeProduct;
     if (configuration.appUserId != null) appUserId = configuration.appUserId;
-    cacheOptions = configuration.cacheOptions;
-    _storeProduct.setCustomerInfoUpdateListener((customerInfo) {
-      _updateCustomerInfoListeners(customerInfo);
-    });
   }
 
   /// called from [StoreProductInterface]

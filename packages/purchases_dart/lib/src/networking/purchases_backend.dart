@@ -1,11 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
-import 'package:purchases_dart/src/networking/api_service.dart';
+import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/parser/offering_parser.dart';
-import 'package:purchases_dart/src/store/store_product_interface.dart';
+import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesBackend {
@@ -18,7 +17,16 @@ class PurchasesBackend {
     required String apiKey,
     required this.storeProduct,
   }) {
-    _httpClient = ApiService.getRevenueCatHttpClient(apiKey);
+    _httpClient = Dio(
+      BaseOptions(
+        baseUrl: 'https://api.revenuecat.com/v1',
+        headers: {
+          'X-Platform': 'stripe',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $apiKey'
+        },
+      ),
+    );
     _offeringParser = OfferingParser(storeProduct);
     _customerParser = CustomerParser();
   }

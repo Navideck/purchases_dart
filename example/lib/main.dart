@@ -3,6 +3,7 @@
 import 'package:example/env.dart' as env;
 import 'package:flutter/material.dart';
 import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart_stripe/purchases_dart_stripe.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

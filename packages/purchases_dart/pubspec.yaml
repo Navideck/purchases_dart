@@ -10,10 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
-  dio_smart_retry: ^6.0.0
-  dio_cache_interceptor: ^3.5.0
   purchases_flutter: ^6.0.0
-  collection: ^1.18.0
   
 dev_dependencies:
   flutter_test:
