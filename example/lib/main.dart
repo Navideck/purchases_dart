@@ -33,19 +33,19 @@ class _MainAppState extends State<MainApp> {
     String stripePriceId,
     Package package,
   ) async {
-    var data = {
-      'success_url': 'https://example.com/success',
-      'cancel_url': 'https://example.com/cancel',
-      'line_items': [
-        {'price': stripePriceId, 'quantity': 1},
+    return StripeCheckoutUrlBuilder(
+      successUrl: 'https://example.com/success',
+      cancelUrl: 'https://example.com/cancel',
+      mode: package.packageType == PackageType.lifetime
+          ? "payment"
+          : "subscription",
+      lineItems: [
+        StripeCheckoutLineItem(
+          priceId: stripePriceId,
+          quantity: 1,
+        ),
       ],
-    };
-    if (package.packageType == PackageType.lifetime) {
-      data['mode'] = "payment";
-    } else {
-      data['mode'] = "subscription";
-    }
-    return data;
+    ).build();
   }
 
   // TestStripeCard: 4242 4242 4242 4242

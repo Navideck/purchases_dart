@@ -9,11 +9,11 @@ typedef CustomerInfoUpdateListener = void Function(CustomerInfo customerInfo);
 
 class PurchasesDart {
   static PurchasesBackend? _backend;
-  static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
-      {};
   static CustomerInfo? _lastReceivedCustomerInfo;
   static late StoreProductInterface _storeProduct;
   static final CustomerParser _customerParser = CustomerParser();
+  static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
+      {};
 
   /// Required to set [appUserId] before using any other methods
   static String? appUserId;
@@ -30,6 +30,7 @@ class PurchasesDart {
       storeProduct: configuration.storeProduct,
     );
     _storeProduct = configuration.storeProduct;
+    _storeProduct.onCustomerInfoUpdate = _updateCustomerInfoListeners;
     if (configuration.appUserId != null) appUserId = configuration.appUserId;
   }
 
@@ -76,6 +77,7 @@ class PurchasesDart {
   static CustomerInfo? createCustomer(Map<String, dynamic> json) =>
       _customerParser.createCustomer(RawCustomer.fromJson(json));
 
+  /// Update customerInfo listeners
   static void _updateCustomerInfoListeners(CustomerInfo customerInfo) async {
     _lastReceivedCustomerInfo = customerInfo;
     for (final listener in _customerInfoUpdateListeners) {

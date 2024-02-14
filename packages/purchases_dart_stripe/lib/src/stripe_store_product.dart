@@ -114,6 +114,11 @@ class StripeStoreProduct extends StoreProductInterface {
     onCheckoutUrlGenerated?.call(sessionId, url);
   }
 
+  /// Update customerInfo listeners from [PurchasesDart]
+  void _updateCustomerInfoListeners(CustomerInfo customerInfo) {
+    onCustomerInfoUpdate?.call(customerInfo);
+  }
+
   /// Helpers
   ///
   /// Get StripeProduct from Stripe API
@@ -179,9 +184,9 @@ class _StripeCustomerCache {
     createdAt = DateTime.now();
   }
 
-  // Expire cache after 2 minutes
+  // Expire cache after 1 minute
   bool isExpired() {
-    return DateTime.now().difference(createdAt).inMinutes > 2;
+    return DateTime.now().difference(createdAt).inMinutes > 1;
   }
 }
 
