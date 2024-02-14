@@ -7,16 +7,19 @@ import 'package:purchases_dart_stripe/src/models/stripe_product.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
-  String stripePriceId,
   Package package,
+  String stripePriceId,
 );
+
+typedef CheckoutUrlGenerated = Function(
+    Package package, String sessionId, String url);
 
 class StripeStoreProduct extends StoreProductInterface {
   late Dio _httpClient;
   StripeCurrencyFormatter? currencyFormatter;
   final List<_StripeCustomerCache> _stripeCustomers = [];
   CheckoutSessionsBuilder? checkoutSessionsBuilder;
-  Function(String sessionId, String url)? onCheckoutUrlGenerated;
+  CheckoutUrlGenerated? onCheckoutUrlGenerated;
 
   StripeStoreProduct({
     required String stripeApi,
@@ -96,8 +99,8 @@ class StripeStoreProduct extends StoreProductInterface {
       throw Exception('StripeCustomer not found for $userId');
     }
     Map<String, dynamic> data = await checkoutSessionsBuilder(
-      priceId,
       packageToPurchase,
+      priceId,
     );
     data['customer'] = stripeCustomer.id;
     data['client_reference_id'] = userId;
@@ -111,11 +114,11 @@ class StripeStoreProduct extends StoreProductInterface {
     if (url == null || sessionId == null) {
       throw Exception('Failed to generate checkout url');
     }
-    onCheckoutUrlGenerated?.call(sessionId, url);
+    onCheckoutUrlGenerated?.call(packageToPurchase, sessionId, url);
   }
 
   /// Update customerInfo listeners from [PurchasesDart]
-  void _updateCustomerInfoListeners(CustomerInfo customerInfo) {
+  void updateCustomerInfoListeners(CustomerInfo customerInfo) {
     onCustomerInfoUpdate?.call(customerInfo);
   }
 

@@ -30,8 +30,8 @@ class _MainAppState extends State<MainApp> {
   bool isLoading = false;
 
   Future<Map<String, dynamic>> _buildStripeCheckoutData(
-    String stripePriceId,
     Package package,
+    String stripePriceId,
   ) async {
     return StripeCheckoutUrlBuilder(
       successUrl: 'https://example.com/success',
@@ -55,7 +55,7 @@ class _MainAppState extends State<MainApp> {
     StoreProductInterface storeProduct = StripeStoreProduct(
       stripeApi: env.stripeApiKey,
       checkoutSessionsBuilder: _buildStripeCheckoutData,
-      onCheckoutUrlGenerated: (String sessionId, String url) =>
+      onCheckoutUrlGenerated: (Package package, String sessionId, String url) =>
           launchUrlString(url),
     );
 
