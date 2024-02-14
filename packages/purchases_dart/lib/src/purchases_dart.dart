@@ -1,26 +1,22 @@
-import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
-import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
+import 'package:purchases_dart/src/purchases_dart_configuration.dart';
+import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 typedef CustomerInfoUpdateListener = void Function(CustomerInfo customerInfo);
 
 class PurchasesDart {
   static PurchasesBackend? _backend;
-  static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
-      {};
   static CustomerInfo? _lastReceivedCustomerInfo;
   static late StoreProductInterface _storeProduct;
   static final CustomerParser _customerParser = CustomerParser();
+  static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
+      {};
 
   /// Required to set [appUserId] before using any other methods
   static String? appUserId;
-
-  /// Set cache options for requests,
-  /// see https://pub.dev/packages/dio_cache_interceptor#cache-options
-  /// make sure to set this before calling [setup]
-  static CacheOptions? cacheOptions;
 
   /// call [configure] before calling any other methods
   static Future<void> configure(
@@ -34,11 +30,8 @@ class PurchasesDart {
       storeProduct: configuration.storeProduct,
     );
     _storeProduct = configuration.storeProduct;
+    _storeProduct.onCustomerInfoUpdate = _updateCustomerInfoListeners;
     if (configuration.appUserId != null) appUserId = configuration.appUserId;
-    cacheOptions = configuration.cacheOptions;
-    _storeProduct.setCustomerInfoUpdateListener((customerInfo) {
-      _updateCustomerInfoListeners(customerInfo);
-    });
   }
 
   /// called from [StoreProductInterface]
@@ -84,6 +77,7 @@ class PurchasesDart {
   static CustomerInfo? createCustomer(Map<String, dynamic> json) =>
       _customerParser.createCustomer(RawCustomer.fromJson(json));
 
+  /// Update customerInfo listeners
   static void _updateCustomerInfoListeners(CustomerInfo customerInfo) async {
     _lastReceivedCustomerInfo = customerInfo;
     for (final listener in _customerInfoUpdateListeners) {

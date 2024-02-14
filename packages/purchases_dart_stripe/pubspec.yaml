@@ -1,0 +1,23 @@
+name: purchases_dart_stripe
+description: "A new Flutter package project."
+version: 0.0.1
+homepage:
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+environment:
+  sdk: '>=3.2.5 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  dio: ^5.4.0
+  purchases_flutter: ^6.0.0  
+  purchases_dart:
+    path: ../purchases_dart
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0

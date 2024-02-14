@@ -1,9 +1,10 @@
 import 'dart:developer';
 
-import 'package:collection/collection.dart';
 import 'package:purchases_dart/src/helper/date_helper.dart';
 import 'package:purchases_dart/src/helper/enum_parser.dart';
+import 'package:purchases_dart/src/helper/extensions.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
+
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Parses a [RawCustomer] into a [CustomerInfo] object.

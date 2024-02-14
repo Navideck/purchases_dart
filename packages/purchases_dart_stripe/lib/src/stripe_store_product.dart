@@ -1,13 +1,15 @@
-import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
-import 'package:purchases_dart/src/helper/log_helper.dart';
-import 'package:purchases_dart/src/model/stripe_customer.dart';
-import 'package:purchases_dart/src/networking/api_service.dart';
-import 'package:purchases_dart/src/model/stripe_currency.dart';
-import 'package:purchases_dart/src/model/stripe_price.dart';
-import 'package:purchases_dart/src/model/stripe_product.dart';
-import 'package:purchases_dart/src/store/store_product_interface.dart';
+import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart_stripe/src/models/stripe_currency.dart';
+import 'package:purchases_dart_stripe/src/models/stripe_customer.dart';
+import 'package:purchases_dart_stripe/src/models/stripe_price.dart';
+import 'package:purchases_dart_stripe/src/models/stripe_product.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+
+typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
+  String stripePriceId,
+  Package package,
+);
 
 class StripeStoreProduct extends StoreProductInterface {
   late Dio _httpClient;
@@ -22,7 +24,15 @@ class StripeStoreProduct extends StoreProductInterface {
     this.currencyFormatter,
     this.onCheckoutUrlGenerated,
   }) {
-    _httpClient = ApiService.getStripeHttpClient(stripeApi);
+    _httpClient = Dio(
+      BaseOptions(
+        baseUrl: 'https://api.stripe.com/v1',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': 'Bearer $stripeApi'
+        },
+      ),
+    );
   }
 
   @override
@@ -62,7 +72,6 @@ class StripeStoreProduct extends StoreProductInterface {
     if (subscriptionsJson == null) return [];
     var subscriptionData = subscriptionsJson['data'];
     if (subscriptionData == null || subscriptionData is! List) return [];
-    logSuccess(subscriptionData);
     // TODO: covert subscriptionData to StoreTransaction
     return [];
   }
@@ -105,6 +114,11 @@ class StripeStoreProduct extends StoreProductInterface {
     onCheckoutUrlGenerated?.call(sessionId, url);
   }
 
+  /// Update customerInfo listeners from [PurchasesDart]
+  void _updateCustomerInfoListeners(CustomerInfo customerInfo) {
+    onCustomerInfoUpdate?.call(customerInfo);
+  }
+
   /// Helpers
   ///
   /// Get StripeProduct from Stripe API
@@ -144,12 +158,9 @@ class StripeStoreProduct extends StoreProductInterface {
     if (customersData == null || customersData is! List) return null;
     StripeCustomer stripeCustomer;
     if (customersData.isEmpty) {
-      logInfo('Creating new StripeCustomer for $userId');
       stripeCustomer = await _createStripeCustomer(userId);
     } else {
-      if (customersData.length > 1) {
-        logError('Multiple customers found for $userId');
-      }
+      if (customersData.length > 1) {}
       stripeCustomer = StripeCustomer.fromJson(customersData.first);
     }
     _stripeCustomers.add(_StripeCustomerCache(userId, stripeCustomer));
@@ -173,8 +184,17 @@ class _StripeCustomerCache {
     createdAt = DateTime.now();
   }
 
-  // Expire cache after 2 minutes
+  // Expire cache after 1 minute
   bool isExpired() {
-    return DateTime.now().difference(createdAt).inMinutes > 2;
+    return DateTime.now().difference(createdAt).inMinutes > 1;
+  }
+}
+
+extension IterableExtension<T> on Iterable<T> {
+  T? firstWhereOrNull(bool Function(T element) test) {
+    for (var element in this) {
+      if (test(element)) return element;
+    }
+    return null;
   }
 }

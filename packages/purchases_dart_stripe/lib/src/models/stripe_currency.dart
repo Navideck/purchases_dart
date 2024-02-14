@@ -1,4 +1,4 @@
-import 'package:purchases_dart/src/model/stripe_price.dart';
+import 'stripe_price.dart';
 
 typedef StripeCurrencyFormatter = StripeCurrency Function(
     int amount, String currency);
