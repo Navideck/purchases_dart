@@ -122,6 +122,22 @@ class StripeStoreProduct extends StoreProductInterface {
     onCustomerInfoUpdate?.call(customerInfo);
   }
 
+  /// Get Stripe billing session url, to open billing portal for the user
+  Future<String?> getBillingSession(
+    String userId, {
+    String? returnUrl,
+  }) async {
+    StripeCustomer? stripeCustomer = await _getStripeCustomer(userId);
+    if (stripeCustomer == null) {
+      throw Exception('StripeCustomer not found for $userId');
+    }
+    final response = await _httpClient.post('/billing_portal/sessions', data: {
+      "customer": stripeCustomer.id,
+      "return_url": returnUrl,
+    });
+    return response.data['url'];
+  }
+
   /// Helpers
   ///
   /// Get StripeProduct from Stripe API
