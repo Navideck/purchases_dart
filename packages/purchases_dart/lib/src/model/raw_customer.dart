@@ -150,7 +150,7 @@ class RawSubscriptionObject {
   final String? id;
   final String identifier;
   final dynamic autoResumeDate;
-  final dynamic billingIssuesDetectedAt;
+  final String? billingIssuesDetectedAt;
   final DateTime? expiresDate;
   final dynamic gracePeriodExpiresDate;
   final bool? isSandbox;
@@ -160,7 +160,7 @@ class RawSubscriptionObject {
   final dynamic refundedAt;
   final String? store;
   final String? storeTransactionId;
-  final dynamic unsubscribeDetectedAt;
+  final String? unsubscribeDetectedAt;
 
   factory RawSubscriptionObject.fromJson(
       String key, Map<String, dynamic> json) {

@@ -87,11 +87,12 @@ class _MainAppState extends State<MainApp> {
         isLoading = false;
         this.customerInfo = customerInfo;
       });
-    } catch (e) {
+    } catch (e, stackTrace) {
       setState(() {
         isLoading = false;
       });
       print(e);
+      print(stackTrace);
     }
   }
 
@@ -265,12 +266,15 @@ class CustomerInfoWidget extends StatelessWidget {
             Text(
               "Entitlements: Active - ${customerInfo.entitlements.active.entries.length} | All - ${customerInfo.entitlements.all.entries.length}",
             ),
-            ...customerInfo.entitlements.active.entries.map((e) {
+            ...customerInfo.entitlements.all.entries.map((e) {
               EntitlementInfo entitlementInfo = e.value;
               return ListTile(
+                tileColor:
+                    entitlementInfo.isActive ? Colors.green : Colors.grey,
                 title: Text('Identifier: ${entitlementInfo.identifier}'),
                 subtitle: Text(
-                    'PurchaseDate: ${entitlementInfo.originalPurchaseDate}'),
+                  'PurchaseDate: ${entitlementInfo.originalPurchaseDate}',
+                ),
               );
             }).toList(),
           ],

@@ -136,8 +136,8 @@ class CustomerParser {
   bool _getWillRenew(
     String? store,
     DateTime? expirationDate,
-    DateTime? unsubscribeDetectedAt,
-    DateTime? billingIssueDetectedAt,
+    String? unsubscribeDetectedAt,
+    String? billingIssueDetectedAt,
   ) {
     var isPromo = store != null && getStore(store) == Store.promotional;
     var isLifetime = expirationDate == null;

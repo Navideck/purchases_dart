@@ -76,7 +76,7 @@ class StripeStoreProduct extends StoreProductInterface {
     var subscriptionData = subscriptionsJson['data'];
     if (subscriptionData == null || subscriptionData is! List) return [];
     // TODO: covert subscriptionData to StoreTransaction
-    return [];
+    throw UnimplementedError();
   }
 
   @override
@@ -115,6 +115,20 @@ class StripeStoreProduct extends StoreProductInterface {
       throw Exception('Failed to generate checkout url');
     }
     onCheckoutUrlGenerated?.call(packageToPurchase, sessionId, url);
+  }
+
+  Future<bool> purchasedPackages(String userId) async {
+    StripeCustomer? stripeCustomer = await _getStripeCustomer(userId);
+    if (stripeCustomer == null) {
+      throw Exception('StripeCustomer not found for $userId');
+    }
+    final subscriptionsResponse =
+        await _httpClient.get('/subscriptions?customer=${stripeCustomer.id}');
+    var subscriptionsJson = subscriptionsResponse.data;
+    if (subscriptionsJson == null) return false;
+    var subscriptionData = subscriptionsJson['data'];
+    if (subscriptionData == null || subscriptionData is! List) return false;
+    return true;
   }
 
   /// Update customerInfo listeners from [PurchasesDart]

@@ -60,10 +60,11 @@ class PurchasesDart {
     return await _backend?.getOfferings(userId ?? appUserId!);
   }
 
-  static Future<void> syncPurchases([String? userId]) async {
-    _validateConfig(userId);
-    return await _backend?.syncPurchases(userId ?? appUserId!);
-  }
+  // Not Implemented
+  // static Future<void> syncPurchases([String? userId]) async {
+  //   _validateConfig(userId);
+  //   return await _backend?.syncPurchases(userId ?? appUserId!);
+  // }
 
   static Future purchasePackage(Package packageToPurchase,
       [String? userId]) async {
