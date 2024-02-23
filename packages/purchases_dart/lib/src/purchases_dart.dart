@@ -1,3 +1,6 @@
+import 'package:purchases_dart/src/helper/cache_manager.dart';
+import 'package:purchases_dart/src/helper/identity_manager.dart';
+import 'package:purchases_dart/src/helper/logger.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
@@ -5,18 +8,18 @@ import 'package:purchases_dart/src/purchases_dart_configuration.dart';
 import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-typedef CustomerInfoUpdateListener = void Function(CustomerInfo customerInfo);
-
 class PurchasesDart {
   static PurchasesBackend? _backend;
   static CustomerInfo? _lastReceivedCustomerInfo;
-  static late StoreProductInterface _storeProduct;
   static final CustomerParser _customerParser = CustomerParser();
-  static final Set<CustomerInfoUpdateListener> _customerInfoUpdateListeners =
-      {};
+  static final Set _customerInfoUpdateListeners = {};
 
-  /// Required to set [appUserId] before using any other methods
-  static String? appUserId;
+  static late StoreProductInterface _storeProduct;
+  static late CacheManager _cacheManager;
+  static late IdentityManager _identityManager;
+
+  /// Get the current app user id
+  static String? get appUserId => _identityManager.currentAppUserID;
 
   /// call [configure] before calling any other methods
   static Future<void> configure(
@@ -25,14 +28,24 @@ class PurchasesDart {
     if (_backend != null) {
       throw Exception("PurchasesDart already configured");
     }
+    _cacheManager = await CacheManager.instance;
     _backend = PurchasesBackend(
       apiKey: configuration.apiKey,
       storeProduct: configuration.storeProduct,
     );
+    _identityManager = IdentityManager(
+      _cacheManager,
+      _backend!,
+    );
     _storeProduct = configuration.storeProduct;
     _storeProduct.onCustomerInfoUpdate = _updateCustomerInfoListeners;
-    if (configuration.appUserId != null) appUserId = configuration.appUserId;
+    _identityManager.configure(configuration.appUserId);
   }
+
+  static void setLogLevel(LogLevel level) => Logger.logLevel = level;
+
+  static void setLogHandler(LogHandler logHandler) =>
+      Logger.logHandler = logHandler;
 
   /// called from [StoreProductInterface]
   static void addCustomerInfoUpdateListener(
@@ -47,31 +60,32 @@ class PurchasesDart {
 
   static void removeCustomerInfoUpdateListener(
     CustomerInfoUpdateListener customerInfoUpdateListener,
-  ) =>
-      _customerInfoUpdateListeners.remove(customerInfoUpdateListener);
-
-  static Future<CustomerInfo?> getCustomerInfo([String? userId]) async {
-    _validateConfig(userId);
-    return await _backend?.getCustomerInfo(userId ?? appUserId!);
+  ) {
+    _customerInfoUpdateListeners.remove(customerInfoUpdateListener);
   }
 
-  static Future<Offerings?> getOfferings([String? userId]) async {
-    _validateConfig(userId);
-    return await _backend?.getOfferings(userId ?? appUserId!);
+  static Future<CustomerInfo?> getCustomerInfo() async {
+    _validateConfig();
+    return await _backend?.getCustomerInfo(appUserId!);
   }
 
-  // Not Implemented
-  // static Future<void> syncPurchases([String? userId]) async {
-  //   _validateConfig(userId);
-  //   return await _backend?.syncPurchases(userId ?? appUserId!);
-  // }
+  static Future<Offerings?> getOfferings() async {
+    _validateConfig();
+    return await _backend?.getOfferings(appUserId!);
+  }
 
-  static Future purchasePackage(Package packageToPurchase,
-      [String? userId]) async {
-    _validateConfig(userId);
+  static Future<LogInResult> login(String newAppUserID) async {
+    _validateConfig();
+    return _identityManager.logIn(newAppUserID);
+  }
+
+  static Future<void> logout() => _identityManager.logOut();
+
+  static Future purchasePackage(Package packageToPurchase) async {
+    _validateConfig();
     return await _storeProduct.purchasePackage(
       packageToPurchase,
-      userId ?? appUserId!,
+      appUserId!,
     );
   }
 
@@ -86,12 +100,12 @@ class PurchasesDart {
     }
   }
 
-  static _validateConfig([String? userId]) {
+  static _validateConfig() {
     if (_backend == null) {
       throw Exception(
           "PurchasesDart.setup() must be called before calling any other methods");
     }
-    if (userId == null && appUserId == null) {
+    if (appUserId == null) {
       throw Exception(
         "Either set PurchasesDart.appUserId or pass userId to method",
       );

@@ -1,3 +1,5 @@
+import 'package:purchases_dart/src/helper/response_json_keys.dart';
+
 class RawCustomer {
   RawCustomer({
     required this.requestDate,
@@ -28,7 +30,7 @@ class RawCustomer {
   final dynamic originalPurchaseDate;
 
   factory RawCustomer.fromJson(Map<String, dynamic> rawJson) {
-    Map<String, dynamic> json = rawJson["subscriber"];
+    Map<String, dynamic> json = rawJson[CustomerInfoResponseJsonKeys.subscriber];
     return RawCustomer(
       requestDate: rawJson["request_date"] ?? "",
       entitlements: entitlementsFromJson(json["entitlements"]),

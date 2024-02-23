@@ -6,22 +6,20 @@ class Endpoint {
 
   String get path => pathTemplate;
 
-  bool supportsSignatureVerification(Endpoint endpoint) {
-    if (endpoint is GetCustomerInfo ||
-        endpoint is LogIn ||
-        endpoint is PostReceipt ||
-        endpoint is GetOfferings ||
-        endpoint is GetProductEntitlementMapping) {
+  bool supportsSignatureVerification() {
+    if (this is GetCustomerInfo ||
+        this is LogIn ||
+        this is PostReceipt ||
+        this is GetOfferings ||
+        this is GetProductEntitlementMapping) {
       return true;
     } else {
       return false;
     }
   }
 
-  bool needsNonceToPerformSigning(Endpoint endpoint) {
-    if (endpoint is GetCustomerInfo ||
-        endpoint is LogIn ||
-        endpoint is PostReceipt) {
+  bool needsNonceToPerformSigning() {
+    if (this is GetCustomerInfo || this is LogIn || this is PostReceipt) {
       return true;
     } else {
       return false;

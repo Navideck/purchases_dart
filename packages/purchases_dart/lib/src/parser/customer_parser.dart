@@ -1,8 +1,7 @@
-import 'dart:developer';
-
 import 'package:purchases_dart/src/helper/date_helper.dart';
 import 'package:purchases_dart/src/helper/enum_parser.dart';
 import 'package:purchases_dart/src/helper/extensions.dart';
+import 'package:purchases_dart/src/helper/logger.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
 
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -154,7 +153,10 @@ class CustomerParser {
     DateTime requestDateTime = DateTime.parse(requestDate);
     var dateActive = DateHelper.isDateActive(expirationDate, requestDateTime);
     if (!dateActive.isActive && !dateActive.inGracePeriod) {
-      log("Entitlement $identifier is no longer active (expired $expirationDate) and it's outside grace period window (last updated $requestDate)");
+      Logger.logEvent(
+        "Entitlement $identifier is no longer active (expired $expirationDate) and it's outside grace period window (last updated $requestDate)",
+        LogLevel.warn,
+      );
     }
     return dateActive.isActive;
   }

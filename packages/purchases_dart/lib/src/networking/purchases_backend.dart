@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:purchases_dart/src/helper/purchase_error_code.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
+import 'package:purchases_dart/src/networking/rc_http_status_code.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/parser/offering_parser.dart';
 import 'package:purchases_dart/src/store_product_interface.dart';
@@ -40,6 +42,33 @@ class PurchasesBackend {
     final response = await _httpClient.get(GetOfferings(userId).path);
     return await _offeringParser.createOfferings(
       RawOfferings.fromJson(response.data),
+    );
+  }
+
+  Future<LogInResult> logIn({
+    required String? oldAppUserID,
+    required String newAppUserID,
+  }) async {
+    Response response = await _httpClient.post(LogIn().path, data: {
+      'app_user_id': oldAppUserID,
+      'new_app_user_id': newAppUserID,
+    });
+    if (response.data == null) {
+      throw const PurchasesDartError(
+        code: PurchasesDartErrorCode.UnknownError,
+      ).toPlatformException();
+    }
+    CustomerInfo? customerInfo = _customerParser.createCustomer(
+      RawCustomer.fromJson(response.data),
+    );
+    if (customerInfo == null) {
+      throw const PurchasesDartError(
+        code: PurchasesDartErrorCode.UnknownError,
+      ).toPlatformException();
+    }
+    return LogInResult(
+      created: response.statusCode == RCHTTPStatusCodes.CREATED,
+      customerInfo: customerInfo,
     );
   }
 

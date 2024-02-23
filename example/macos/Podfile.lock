@@ -1,17 +1,21 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - purchases_flutter (6.18.0):
+  - purchases_flutter (6.21.1):
     - FlutterMacOS
-    - PurchasesHybridCommon (= 9.2.0)
-  - PurchasesHybridCommon (9.2.0):
-    - RevenueCat (= 4.32.2)
-  - RevenueCat (4.32.2)
+    - PurchasesHybridCommon (= 9.7.2)
+  - PurchasesHybridCommon (9.7.2):
+    - RevenueCat (= 4.36.3)
+  - RevenueCat (4.36.3)
+  - shared_preferences_foundation (0.0.1):
+    - Flutter
+    - FlutterMacOS
   - url_launcher_macos (0.0.1):
     - FlutterMacOS
 
 DEPENDENCIES:
   - FlutterMacOS (from `Flutter/ephemeral`)
   - purchases_flutter (from `Flutter/ephemeral/.symlinks/plugins/purchases_flutter/macos`)
+  - shared_preferences_foundation (from `Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin`)
   - url_launcher_macos (from `Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos`)
 
 SPEC REPOS:
@@ -24,14 +28,17 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral
   purchases_flutter:
     :path: Flutter/ephemeral/.symlinks/plugins/purchases_flutter/macos
+  shared_preferences_foundation:
+    :path: Flutter/ephemeral/.symlinks/plugins/shared_preferences_foundation/darwin
   url_launcher_macos:
     :path: Flutter/ephemeral/.symlinks/plugins/url_launcher_macos/macos
 
 SPEC CHECKSUMS:
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  purchases_flutter: 46c356df43f76d58902f90751ba9d1d5978d9d56
-  PurchasesHybridCommon: e6c4550d06ecdfc61a228a0e17b2f125b3bd14c2
-  RevenueCat: 298f40f434e6675ea51744cfca5945f09f7c5a07
+  purchases_flutter: 1e3706325ba600a7cf2b7c4efd9d190194b6e07c
+  PurchasesHybridCommon: 9250db8073ad8ad7e84e4544c1f7b8ef6cd969af
+  RevenueCat: 7be0d7bde9efb2fc1ebd1888522c55bb4f9feb18
+  shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
   url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367

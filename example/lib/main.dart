@@ -24,7 +24,8 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-  final String userId = "test_user";
+  final TextEditingController _userIdController = TextEditingController();
+
   Offerings? offerings;
   CustomerInfo? customerInfo;
   bool isLoading = false;
@@ -48,10 +49,14 @@ class _MainAppState extends State<MainApp> {
     ).build();
   }
 
-  // TestStripeCard: 4242 4242 4242 4242
-  @override
-  void initState() {
-    // use stripe storeProductInterface
+  Future<void> _initialize() async {
+    PurchasesDart.addCustomerInfoUpdateListener((customerInfo) {
+      print("CustomerInfoUpdateListener");
+      print(customerInfo.toJson());
+    });
+
+    PurchasesDart.setLogLevel(LogLevel.verbose);
+
     StoreProductInterface storeProduct = StripeStoreProduct(
       stripeApi: env.stripeApiKey,
       checkoutSessionsBuilder: _buildStripeCheckoutData,
@@ -60,26 +65,26 @@ class _MainAppState extends State<MainApp> {
     );
 
     // configure PurchasesDart
-    PurchasesDart.configure(
+    await PurchasesDart.configure(
       PurchasesDartConfiguration(
         apiKey: env.revenueCatApiKey,
-        appUserId: userId,
+        // appUserId: userId,
         storeProduct: storeProduct,
       ),
     );
 
-    // add customerInfoUpdateListener
-    PurchasesDart.addCustomerInfoUpdateListener((customerInfo) {
-      print("CustomerInfoUpdateListener");
-      print(customerInfo.toJson());
-    });
+    _userIdController.text = PurchasesDart.appUserId ?? "";
+  }
+
+  // TestStripeCard: 4242 4242 4242 4242
+  @override
+  void initState() {
     super.initState();
+    _initialize();
   }
 
   void _getCustomerInfo() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
     try {
       CustomerInfo? customerInfo = await PurchasesDart.getCustomerInfo();
       print(customerInfo?.toJson());
@@ -88,18 +93,14 @@ class _MainAppState extends State<MainApp> {
         this.customerInfo = customerInfo;
       });
     } catch (e, stackTrace) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       print(e);
       print(stackTrace);
     }
   }
 
   void _getOfferings() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
     try {
       Offerings? offerings = await PurchasesDart.getOfferings();
       print(offerings?.toJson());
@@ -108,33 +109,47 @@ class _MainAppState extends State<MainApp> {
         isLoading = false;
       });
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       print(e);
     }
   }
 
   void _purchasePackage(Package package) async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
     try {
       await PurchasesDart.purchasePackage(package);
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      setState(() => isLoading = false);
       print(e);
     }
   }
 
-  // void _syncPurchases() async {
-  //   await PurchasesDart.syncPurchases(userId);
-  // }
+  Future<void> loginUser() async {
+    try {
+      LogInResult? logInResult = await PurchasesDart.login(
+        _userIdController.text,
+      );
+      print(
+        'LogInResult: Created: ${logInResult.created} | Customer: ${logInResult.customerInfo}',
+      );
+      setState(() {
+        customerInfo = logInResult.customerInfo;
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> logoutUser() async {
+    try {
+      await PurchasesDart.logout();
+      _userIdController.text = PurchasesDart.appUserId ?? "";
+      _getCustomerInfo();
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,6 +160,32 @@ class _MainAppState extends State<MainApp> {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: _userIdController,
+                decoration: const InputDecoration(
+                  labelText: "User Id",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: loginUser,
+                    child: const Text("Login"),
+                  ),
+                  ElevatedButton(
+                    onPressed: logoutUser,
+                    child: const Text("Logout"),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
@@ -161,18 +202,6 @@ class _MainAppState extends State<MainApp> {
                 ],
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.symmetric(vertical: 8.0),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            //     children: [
-            //       ElevatedButton(
-            //         onPressed: _syncPurchases,
-            //         child: const Text("Sync Purchases"),
-            //       ),
-            //     ],
-            //   ),
-            // ),
             const Divider(),
             if (isLoading) const CircularProgressIndicator.adaptive(),
             Expanded(
@@ -259,8 +288,11 @@ class CustomerInfoWidget extends StatelessWidget {
         child: Column(
           children: [
             ListTile(
-              title: Text("Customer Info :${customerInfo.originalAppUserId}"),
-              subtitle: Text('FirstSeen: ${customerInfo.firstSeen}'),
+              title: const Text("Customer Info"),
+              subtitle: Text(
+                'OriginalAppUserID: ${customerInfo.originalAppUserId}'
+                '\nFirstSeen: ${customerInfo.firstSeen}',
+              ),
             ),
             const Divider(),
             Text(
