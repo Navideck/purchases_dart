@@ -6,25 +6,15 @@ class Endpoint {
 
   String get path => pathTemplate;
 
-  bool supportsSignatureVerification() {
-    if (this is GetCustomerInfo ||
-        this is LogIn ||
-        this is PostReceipt ||
-        this is GetOfferings ||
-        this is GetProductEntitlementMapping) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  bool supportsSignatureVerification() =>
+      this is GetCustomerInfo ||
+      this is LogIn ||
+      this is PostReceipt ||
+      this is GetOfferings ||
+      this is GetProductEntitlementMapping;
 
-  bool needsNonceToPerformSigning() {
-    if (this is GetCustomerInfo || this is LogIn || this is PostReceipt) {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  bool needsNonceToPerformSigning() =>
+      this is GetCustomerInfo || this is LogIn || this is PostReceipt;
 }
 
 class GetCustomerInfo extends Endpoint {

@@ -19,11 +19,9 @@ class SigningManager {
   }
 
   String createRandomNonce() {
-    final bytes = Uint8List(_nonceBytesSize);
-    final secureRandom = Random.secure();
-    for (var i = 0; i < _nonceBytesSize; i++) {
-      bytes[i] = secureRandom.nextInt(256);
-    }
+    final bytes = Uint8List.fromList(
+      List.generate(_nonceBytesSize, (_) => Random.secure().nextInt(256)),
+    );
     return base64.encode(bytes).trim();
   }
 

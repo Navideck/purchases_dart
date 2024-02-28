@@ -75,7 +75,7 @@ class PurchasesDart {
   }
 
   static Future<LogInResult> login(String newAppUserID) async {
-    _validateConfig();
+    _validateConfig(newAppUserID);
     return _identityManager.logIn(newAppUserID);
   }
 
@@ -100,15 +100,13 @@ class PurchasesDart {
     }
   }
 
-  static _validateConfig() {
+  static _validateConfig([String? userId]) {
     if (_backend == null) {
       throw Exception(
           "PurchasesDart.setup() must be called before calling any other methods");
     }
-    if (appUserId == null) {
-      throw Exception(
-        "Either set PurchasesDart.appUserId or pass userId to method",
-      );
+    if (userId == null && appUserId == null) {
+      throw Exception("Failed to get userId");
     }
   }
 }
