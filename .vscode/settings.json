@@ -2,6 +2,8 @@
     "cSpell.words": [
         "ETAG",
         "livemode",
+        "pointycastle",
         "RCHTTP"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

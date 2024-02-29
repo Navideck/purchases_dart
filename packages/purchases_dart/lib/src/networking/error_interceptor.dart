@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:purchases_dart/src/helper/log_helper.dart';
+import 'package:purchases_dart/src/helper/logger.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 class ErrorInterceptor extends Interceptor {
   ErrorInterceptor();
@@ -47,7 +48,10 @@ class ErrorInterceptor extends Interceptor {
         }
     }
     if (err.type == DioExceptionType.cancel) {
-      logInfo("RequestCanceled -> ${err.requestOptions.uri.path}");
+      Logger.logEvent(
+        "RequestCanceled -> ${err.requestOptions.uri.path}",
+        LogLevel.error,
+      );
       return;
     }
     return handler.next(err);
