@@ -46,12 +46,12 @@ class PurchasesBackend {
   }
 
   Future<LogInResult> logIn({
-    required String? oldAppUserID,
-    required String newAppUserID,
+    required String? oldAppUserId,
+    required String newAppUserId,
   }) async {
     Response response = await _httpClient.post(LogIn().path, data: {
-      'app_user_id': oldAppUserID,
-      'new_app_user_id': newAppUserID,
+      'app_user_id': oldAppUserId,
+      'new_app_user_id': newAppUserId,
     });
     if (response.data == null) {
       throw const PurchasesDartError(

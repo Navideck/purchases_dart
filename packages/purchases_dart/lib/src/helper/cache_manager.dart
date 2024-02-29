@@ -15,9 +15,9 @@ class CacheManager {
 
   final _appUserIdKey = 'appUserID';
 
-  String? getCachedAppUserID() => _storage.getString(_appUserIdKey);
+  String? getCachedAppUserId() => _storage.getString(_appUserIdKey);
 
-  Future<void> setCachedAppUserID(String? value) async => value == null
+  Future<void> setCachedAppUserId(String? value) async => value == null
       ? await _storage.remove(_appUserIdKey)
       : await _storage.setString(_appUserIdKey, value);
 }

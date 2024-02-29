@@ -11,53 +11,53 @@ class IdentityManager {
 
   IdentityManager(this.deviceCache, this.backend);
 
-  String? get currentAppUserID => deviceCache.getCachedAppUserID();
+  String? get currentAppUserId => deviceCache.getCachedAppUserId();
 
   final RegExp anonymousIdRegex = RegExp(r'^\$RCAnonymousID:([a-f0-9]{32})$');
 
-  void configure(String? appUserID) {
-    if (appUserID?.trim().isEmpty == true) {
+  void configure(String? appUserId) {
+    if (appUserId?.trim().isEmpty == true) {
       Logger.logEvent(
           'EMPTY_APP_USER_ID_WILL_BECOME_ANONYMOUS', LogLevel.debug);
     }
 
-    final appUserIDToUse = appUserID?.trim().isNotEmpty == true
-        ? appUserID
-        : deviceCache.getCachedAppUserID() ?? _generateRandomID();
+    final appUserIdToUse = appUserId?.trim().isNotEmpty == true
+        ? appUserId
+        : deviceCache.getCachedAppUserId() ?? _generateRandomId();
 
-    Logger.logEvent('IDENTIFYING_APP_USER_ID $appUserIDToUse', LogLevel.debug);
+    Logger.logEvent('IDENTIFYING_APP_USER_ID $appUserIdToUse', LogLevel.debug);
 
-    deviceCache.setCachedAppUserID(appUserIDToUse);
+    deviceCache.setCachedAppUserId(appUserIdToUse);
   }
 
-  Future<LogInResult> logIn(String newAppUserID) async {
-    if (newAppUserID.trim().isEmpty) {
+  Future<LogInResult> logIn(String newAppUserId) async {
+    if (newAppUserId.trim().isEmpty) {
       throw const PurchasesDartError(
         code: PurchasesDartErrorCode.InvalidAppUserIdError,
       ).toPlatformException();
     }
 
-    if (currentAppUserID == newAppUserID) {
+    if (currentAppUserId == newAppUserId) {
       Logger.logEvent('LOG_IN_CALLED_WITH_SAME_APP_USER_ID', LogLevel.error);
       throw Exception('Log in called with the same appUserID');
     }
 
-    Logger.logEvent('LOGGING_IN $currentAppUserID -> $newAppUserID');
-    final oldAppUserID = currentAppUserID;
+    Logger.logEvent('LOGGING_IN $currentAppUserId -> $newAppUserId');
+    final oldAppUserId = currentAppUserId;
 
     LogInResult loginResult = await backend.logIn(
-      oldAppUserID: oldAppUserID,
-      newAppUserID: newAppUserID,
+      oldAppUserId: oldAppUserId,
+      newAppUserId: newAppUserId,
     );
 
-    deviceCache.setCachedAppUserID(newAppUserID);
+    deviceCache.setCachedAppUserId(newAppUserId);
 
     return loginResult;
   }
 
-  void switchUser(String newAppUserID) {
-    Logger.logEvent('SWITCHING_USER $newAppUserID');
-    _resetAndSaveUserID(newAppUserID);
+  void switchUser(String newAppUserId) {
+    Logger.logEvent('SWITCHING_USER $newAppUserId');
+    _resetAndSaveUserId(newAppUserId);
   }
 
   Future<void> logOut() async {
@@ -67,29 +67,29 @@ class IdentityManager {
         code: PurchasesDartErrorCode.LogOutWithAnonymousUserError,
       ).toPlatformException();
     }
-    _resetAndSaveUserID(_generateRandomID());
+    _resetAndSaveUserId(_generateRandomId());
     Logger.logEvent('LOG_OUT_SUCCESSFUL');
   }
 
   bool currentUserIsAnonymous() {
-    final currentAppUserIDLooksAnonymous =
-        _isUserIDAnonymous(deviceCache.getCachedAppUserID() ?? '');
-    return currentAppUserIDLooksAnonymous;
+    final currentAppUserIdLooksAnonymous =
+        _isUserIdAnonymous(deviceCache.getCachedAppUserId() ?? '');
+    return currentAppUserIdLooksAnonymous;
   }
 
   // Private functions
-  bool _isUserIDAnonymous(String appUserID) {
-    return anonymousIdRegex.hasMatch(appUserID);
+  bool _isUserIdAnonymous(String appUserId) {
+    return anonymousIdRegex.hasMatch(appUserId);
   }
 
-  String _generateRandomID() {
+  String _generateRandomId() {
     var uuid = const Uuid().v4();
     var randomId = "\$RCAnonymousID:${uuid.replaceAll("-", "").toLowerCase()}";
     Logger.logEvent('Setting new anonymous ID: $randomId');
     return randomId;
   }
 
-  void _resetAndSaveUserID(String newUserID) {
-    deviceCache.setCachedAppUserID(newUserID);
+  void _resetAndSaveUserId(String newUserId) {
+    deviceCache.setCachedAppUserId(newUserId);
   }
 }

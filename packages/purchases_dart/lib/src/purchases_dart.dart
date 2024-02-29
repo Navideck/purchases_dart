@@ -19,7 +19,7 @@ class PurchasesDart {
   static late IdentityManager _identityManager;
 
   /// Get the current app user id
-  static String? get appUserId => _identityManager.currentAppUserID;
+  static String? get appUserId => _identityManager.currentAppUserId;
 
   /// call [configure] before calling any other methods
   static Future<void> configure(
@@ -74,9 +74,11 @@ class PurchasesDart {
     return await _backend?.getOfferings(appUserId!);
   }
 
-  static Future<LogInResult> login(String newAppUserID) async {
-    _validateConfig(newAppUserID);
-    return _identityManager.logIn(newAppUserID);
+  @Deprecated(
+      'Login method using undocumented APIs which might change or stop working, set appUserId in configure instead')
+  static Future<LogInResult> login(String newAppUserId) async {
+    _validateConfig(newAppUserId);
+    return _identityManager.logIn(newAppUserId);
   }
 
   static Future<void> logout() => _identityManager.logOut();
