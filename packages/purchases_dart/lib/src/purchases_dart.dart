@@ -83,6 +83,12 @@ class PurchasesDart {
 
   static Future<void> logout() => _identityManager.logOut();
 
+  /// Update app user id, this will change the current app user id locally
+  static Future<void> updateAppUserId(String appUserId) async {
+    _validateConfig(appUserId);
+    await _identityManager.updateAppUserId(appUserId);
+  }
+
   static Future purchasePackage(Package packageToPurchase) async {
     _validateConfig();
     return await _storeProduct.purchasePackage(

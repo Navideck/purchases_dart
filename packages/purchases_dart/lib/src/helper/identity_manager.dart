@@ -77,6 +77,15 @@ class IdentityManager {
     return currentAppUserIdLooksAnonymous;
   }
 
+  Future<void> updateAppUserId(String appUserId) async {
+    if (appUserId.trim().isEmpty) {
+      throw const PurchasesDartError(
+        code: PurchasesDartErrorCode.InvalidAppUserIdError,
+      ).toPlatformException();
+    }
+    deviceCache.setCachedAppUserId(appUserId);
+  }
+
   // Private functions
   bool _isUserIdAnonymous(String appUserId) {
     return anonymousIdRegex.hasMatch(appUserId);
