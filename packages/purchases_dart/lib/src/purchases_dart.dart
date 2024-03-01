@@ -64,16 +64,19 @@ class PurchasesDart {
     _customerInfoUpdateListeners.remove(customerInfoUpdateListener);
   }
 
+  /// Gets the latest Customer Info for the customer with the given App User ID, or creates a new customer if it doesn't exist.
   static Future<CustomerInfo?> getCustomerInfo() async {
     _validateConfig();
     return await _backend?.getCustomerInfo(appUserId!);
   }
 
+  /// Gets the offerings for your app.
   static Future<Offerings?> getOfferings() async {
     _validateConfig();
     return await _backend?.getOfferings(appUserId!);
   }
 
+  /// Changes the appUserID that purchaser is currently using.
   @Deprecated(
       'Login method using undocumented APIs which might change or stop working, set appUserId in configure instead')
   static Future<LogInResult> login(String newAppUserId) async {
