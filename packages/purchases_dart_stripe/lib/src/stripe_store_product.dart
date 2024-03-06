@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:dio/dio.dart';
 import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_currency.dart';
@@ -6,26 +8,32 @@ import 'package:purchases_dart_stripe/src/models/stripe_price.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_product.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
-typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
-  Package package,
-  String stripePriceId,
-);
-
-typedef CheckoutUrlGenerated = Function(
-    Package package, String sessionId, String url);
-
+/// Setup [CheckoutSessionsBuilder] to generate checkout session data for an item or use [StripeCheckoutUrlBuilder] for basic implementation
+/// available params: https://docs.stripe.com/api/checkout/sessions/object
+///
+/// Setup [CheckoutUrlGenerated] to get checkout url after generating checkout session, launch this url in browser to complete the purchase
+///
+/// Setup [StripeCurrencyFormatter] to format currency as per your requirement, default formatter: [StripeCurrency.defaultCurrencyFormatter]
+/// supported currencies: https://docs.stripe.com/currencies
+///
+/// Setup [StripeNewCustomerBuilder] to add extra data for a new stripe customer
+/// available params: https://docs.stripe.com/api/customers/create
+///
 class StripeStoreProduct extends StoreProductInterface {
   late Dio _httpClient;
-  StripeCurrencyFormatter? currencyFormatter;
   final List<_StripeCustomerCache> _stripeCustomers = [];
+
   CheckoutSessionsBuilder? checkoutSessionsBuilder;
   CheckoutUrlGenerated? onCheckoutUrlGenerated;
+  StripeCurrencyFormatter? currencyFormatter;
+  StripeNewCustomerBuilder? stripeNewCustomerBuilder;
 
   StripeStoreProduct({
     required String stripeApi,
     this.checkoutSessionsBuilder,
-    this.currencyFormatter,
     this.onCheckoutUrlGenerated,
+    this.currencyFormatter,
+    this.stripeNewCustomerBuilder,
   }) {
     _httpClient = Dio(
       BaseOptions(
@@ -36,6 +44,7 @@ class StripeStoreProduct extends StoreProductInterface {
         },
       ),
     );
+    _httpClient.interceptors.add(_ErrorInterceptor());
   }
 
   @override
@@ -152,6 +161,11 @@ class StripeStoreProduct extends StoreProductInterface {
     return response.data['url'];
   }
 
+  /// Expire checkout session
+  Future<void> expireCheckoutSession(String sessionId) async {
+    await _httpClient.post('/checkout/sessions/$sessionId/expire');
+  }
+
   /// Helpers
   ///
   /// Get StripeProduct from Stripe API
@@ -187,13 +201,16 @@ class StripeStoreProduct extends StoreProductInterface {
         "query": 'metadata["uid"]:"$userId"',
       },
     );
+
     var customersData = customers.data?['data'];
     if (customersData == null || customersData is! List) return null;
     StripeCustomer stripeCustomer;
     if (customersData.isEmpty) {
       stripeCustomer = await _createStripeCustomer(userId);
     } else {
-      if (customersData.length > 1) {}
+      if (customersData.length > 1) {
+        log('Multiple customers found for $userId');
+      }
       stripeCustomer = StripeCustomer.fromJson(customersData.first);
     }
     _stripeCustomers.add(_StripeCustomerCache(userId, stripeCustomer));
@@ -202,9 +219,15 @@ class StripeStoreProduct extends StoreProductInterface {
 
   /// Create StripeCustomer from Stripe API linked with [userId]
   Future<StripeCustomer> _createStripeCustomer(String userId) async {
-    final response = await _httpClient.post('/customers', data: {
-      "metadata": {"uid": userId}
+    Map<String, dynamic> data = {
+      "metadata": {"uid": userId},
+    };
+    var customerExtraData = await stripeNewCustomerBuilder?.call(userId);
+    customerExtraData?.forEach((key, value) {
+      if (value != null) data[key] = value;
     });
+    log('Creating new stripe customer for $userId : $data');
+    final response = await _httpClient.post('/customers', data: data);
     return StripeCustomer.fromJson(response.data);
   }
 }
@@ -229,5 +252,65 @@ extension IterableExtension<T> on Iterable<T> {
       if (test(element)) return element;
     }
     return null;
+  }
+}
+
+/// Custom types
+typedef CheckoutSessionsBuilder = Future<Map<String, dynamic>> Function(
+  Package package,
+  String stripePriceId,
+);
+
+typedef StripeNewCustomerBuilder = Future<Map<String, dynamic>> Function(
+  String userId,
+);
+
+typedef CheckoutUrlGenerated = Function(
+  Package package,
+  String sessionId,
+  String url,
+);
+
+typedef StripeCurrencyFormatter = StripeCurrency Function(
+  int amount,
+  String currency,
+);
+
+class _ErrorInterceptor extends Interceptor {
+  _ErrorInterceptor();
+
+  @override
+  void onError(DioException err, ErrorInterceptorHandler handler) {
+    switch (err.type) {
+      case DioExceptionType.connectionTimeout:
+        throw "Connection Timeout";
+      case DioExceptionType.sendTimeout:
+        throw "Send Timeout";
+      case DioExceptionType.receiveTimeout:
+        throw "Receive Timeout";
+      case DioExceptionType.badResponse:
+        var responseData = err.response?.data;
+        if (responseData != null) {
+          throw Exception(responseData.toString());
+        } else if (err.message != null) {
+          throw Exception(err.message);
+        }
+        throw Exception("Bad Response");
+      case DioExceptionType.cancel:
+        break;
+      case DioExceptionType.unknown:
+      default:
+        if (err.error.toString().contains('SocketException')) {
+          throw "Please check your internet connection";
+        } else if (err.error.toString().contains('CERTIFICATE_VERIFY_FAILED')) {
+          throw "Certificate verification failed";
+        } else {
+          throw Exception(err.error);
+        }
+    }
+    if (err.type == DioExceptionType.cancel) {
+      return;
+    }
+    return handler.next(err);
   }
 }

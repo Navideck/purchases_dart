@@ -1,7 +1,7 @@
 class StripeCheckoutUrlBuilder {
   String successUrl;
   String cancelUrl;
-  String mode;
+  StripePaymentMode mode;
   List<StripeCheckoutLineItem> lineItems;
 
   StripeCheckoutUrlBuilder({
@@ -16,9 +16,18 @@ class StripeCheckoutUrlBuilder {
       'success_url': successUrl,
       'cancel_url': cancelUrl,
       'line_items': lineItems.map((e) => e.toJson()).toList(),
-      'mode': mode,
+      'mode': mode.value,
     };
   }
+}
+
+enum StripePaymentMode {
+  payment("payment"),
+  setup("setup"),
+  subscription("subscription");
+
+  const StripePaymentMode(this.value);
+  final String value;
 }
 
 class StripeCheckoutLineItem {
