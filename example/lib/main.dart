@@ -38,8 +38,8 @@ class _MainAppState extends State<MainApp> {
       successUrl: 'https://example.com/success',
       cancelUrl: 'https://example.com/cancel',
       mode: package.packageType == PackageType.lifetime
-          ? "payment"
-          : "subscription",
+          ? StripePaymentMode.payment
+          : StripePaymentMode.subscription,
       lineItems: [
         StripeCheckoutLineItem(
           priceId: stripePriceId,
