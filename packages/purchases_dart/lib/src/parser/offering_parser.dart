@@ -55,7 +55,7 @@ class OfferingParser {
     RawPackage rawPackage,
     String offeringIdentifier,
   ) async {
-    String? identifier = rawPackage.identifier?.replaceFirst("\$", "");
+    String? identifier = rawPackage.identifier;
     if (identifier == null) return null;
     String? platformProductId = rawPackage.platformProductIdentifier;
     if (platformProductId == null) return null;
