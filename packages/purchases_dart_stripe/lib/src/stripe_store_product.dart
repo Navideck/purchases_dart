@@ -62,6 +62,8 @@ class StripeStoreProduct extends StoreProductInterface {
     StripeCurrency stripeCurrency =
         StripeCurrency.fromStripePrice(stripePrice, currencyFormatter);
 
+        Store.stripe;
+
     // Return StoreProduct
     return StoreProduct(
       stripeProduct.id,

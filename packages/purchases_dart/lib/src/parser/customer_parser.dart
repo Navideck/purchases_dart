@@ -129,6 +129,11 @@ class CustomerParser {
       subscriptionObject.originalPurchaseDate?.toString() ?? "",
       entitlement.productIdentifier ?? "",
       subscriptionObject.isSandbox ?? false,
+      store: getStore(subscriptionObject.store),
+      periodType: getPeriodType(subscriptionObject.periodType),
+      expirationDate: subscriptionObject.expiresDate?.toString(),
+      unsubscribeDetectedAt: subscriptionObject.unsubscribeDetectedAt,
+      billingIssueDetectedAt: subscriptionObject.billingIssuesDetectedAt,
     );
   }
 

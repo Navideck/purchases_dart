@@ -3,8 +3,9 @@ import 'dart:convert';
 import 'package:purchases_flutter/models/entitlement_info_wrapper.dart';
 import 'package:purchases_flutter/models/store.dart';
 
-Store getStore(String name) {
-  switch (name.toLowerCase()) {
+Store getStore(String? store) {
+  if (store == null) return Store.unknownStore;
+  switch (store.toLowerCase()) {
     case "app_store":
       return Store.appStore;
     case "mac_app_store":
@@ -22,8 +23,8 @@ Store getStore(String name) {
   }
 }
 
-PeriodType getPeriodType(String name) {
-  switch (jsonDecode(name)) {
+PeriodType getPeriodType(String? name) {
+  switch (name?.toLowerCase()) {
     case "normal":
       return PeriodType.normal;
     case "intro":
