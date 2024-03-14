@@ -9,9 +9,9 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesBackend {
   late Dio _httpClient;
-  late OfferingParser _offeringParser;
-  late CustomerParser _customerParser;
-  StoreProductInterface storeProduct;
+  OfferingParser? _offeringParser;
+  CustomerParser? _customerParser;
+  StoreProductInterface? storeProduct;
 
   PurchasesBackend({
     required String apiKey,
@@ -27,7 +27,7 @@ class PurchasesBackend {
         },
       ),
     );
-    _offeringParser = OfferingParser(storeProduct);
+    if (storeProduct != null) _offeringParser = OfferingParser(storeProduct!);
     _customerParser = CustomerParser();
   }
 
@@ -39,10 +39,18 @@ class PurchasesBackend {
       GetCustomerInfo(userId).path,
       options: headers?.dioOptions,
     );
-    return _customerParser.createCustomer(RawCustomer.fromJson(response.data));
+    return _customerParser?.createCustomer(RawCustomer.fromJson(response.data));
   }
 
   Future<Offerings?> getOfferings(
+    String userId, {
+    PurchasesHeader? headers,
+  }) async {
+    final rawOfferings = await getRawOfferings(userId, headers: headers);
+    return await _offeringParser?.createOfferings(rawOfferings);
+  }
+
+  Future<RawOfferings> getRawOfferings(
     String userId, {
     PurchasesHeader? headers,
   }) async {
@@ -50,9 +58,7 @@ class PurchasesBackend {
       GetOfferings(userId).path,
       options: headers?.dioOptions,
     );
-    return await _offeringParser.createOfferings(
-      RawOfferings.fromJson(response.data),
-    );
+    return RawOfferings.fromJson(response.data);
   }
 
   Future<LogInResult> logIn({
@@ -68,7 +74,7 @@ class PurchasesBackend {
         code: PurchasesDartErrorCode.UnknownError,
       ).toPlatformException();
     }
-    CustomerInfo? customerInfo = _customerParser.createCustomer(
+    CustomerInfo? customerInfo = _customerParser?.createCustomer(
       RawCustomer.fromJson(response.data),
     );
     if (customerInfo == null) {
@@ -84,7 +90,7 @@ class PurchasesBackend {
 
   Future<void> syncPurchases(String userId) async {
     // List<StoreTransaction> storeTransactions =
-    await storeProduct.queryAllPurchases(userId);
+    await storeProduct?.queryAllPurchases(userId);
     // final response = await _httpClient.get(SyncPurchases(userId).path);
     // print(response.data);
     // for (StoreTransaction transaction in storeTransactions) {
