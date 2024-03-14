@@ -1,6 +1,7 @@
 import 'package:purchases_dart/src/helper/cache_manager.dart';
 import 'package:purchases_dart/src/helper/identity_manager.dart';
 import 'package:purchases_dart/src/helper/logger.dart';
+import 'package:purchases_dart/src/model/purchases_header.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
@@ -64,14 +65,24 @@ class PurchasesDart {
     _customerInfoUpdateListeners.remove(customerInfoUpdateListener);
   }
 
-  static Future<CustomerInfo?> getCustomerInfo() async {
+  static Future<CustomerInfo?> getCustomerInfo({
+    PurchasesHeader? headers,
+  }) async {
     _validateConfig();
-    return await _backend?.getCustomerInfo(appUserId!);
+    return await _backend?.getCustomerInfo(
+      appUserId!,
+      headers: headers,
+    );
   }
 
-  static Future<Offerings?> getOfferings() async {
+  static Future<Offerings?> getOfferings({
+    PurchasesHeader? headers,
+  }) async {
     _validateConfig();
-    return await _backend?.getOfferings(appUserId!);
+    return await _backend?.getOfferings(
+      appUserId!,
+      headers: headers,
+    );
   }
 
   @Deprecated(

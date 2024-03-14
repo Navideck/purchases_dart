@@ -1,12 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_dart/src/helper/purchase_error_code.dart';
-import 'package:purchases_dart/src/model/raw_customer.dart';
-import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
 import 'package:purchases_dart/src/networking/rc_http_status_code.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/parser/offering_parser.dart';
-import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class PurchasesBackend {
@@ -33,13 +31,25 @@ class PurchasesBackend {
     _customerParser = CustomerParser();
   }
 
-  Future<CustomerInfo?> getCustomerInfo(String userId) async {
-    final response = await _httpClient.get(GetCustomerInfo(userId).path);
+  Future<CustomerInfo?> getCustomerInfo(
+    String userId, {
+    PurchasesHeader? headers,
+  }) async {
+    final response = await _httpClient.get(
+      GetCustomerInfo(userId).path,
+      options: headers?.dioOptions,
+    );
     return _customerParser.createCustomer(RawCustomer.fromJson(response.data));
   }
 
-  Future<Offerings?> getOfferings(String userId) async {
-    final response = await _httpClient.get(GetOfferings(userId).path);
+  Future<Offerings?> getOfferings(
+    String userId, {
+    PurchasesHeader? headers,
+  }) async {
+    final response = await _httpClient.get(
+      GetOfferings(userId).path,
+      options: headers?.dioOptions,
+    );
     return await _offeringParser.createOfferings(
       RawOfferings.fromJson(response.data),
     );
