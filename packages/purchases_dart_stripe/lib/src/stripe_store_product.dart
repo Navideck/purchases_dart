@@ -70,7 +70,11 @@ class StripeStoreProduct extends StoreProductInterface {
       stripeCurrency.amount,
       stripeCurrency.formattedPrice,
       stripeCurrency.currency,
-      presentedOfferingIdentifier: stripeProduct.defaultPrice,
+      presentedOfferingContext: PresentedOfferingContext(
+        stripeProduct.defaultPrice,
+        null,
+        null,
+      ),
     );
   }
 

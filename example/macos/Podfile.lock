@@ -1,11 +1,11 @@
 PODS:
   - FlutterMacOS (1.0.0)
-  - purchases_flutter (6.21.1):
+  - purchases_flutter (6.24.0):
     - FlutterMacOS
-    - PurchasesHybridCommon (= 9.7.2)
-  - PurchasesHybridCommon (9.7.2):
-    - RevenueCat (= 4.36.3)
-  - RevenueCat (4.36.3)
+    - PurchasesHybridCommon (= 10.2.0)
+  - PurchasesHybridCommon (10.2.0):
+    - RevenueCat (= 4.39.0)
+  - RevenueCat (4.39.0)
   - shared_preferences_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -35,12 +35,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
-  purchases_flutter: 1e3706325ba600a7cf2b7c4efd9d190194b6e07c
-  PurchasesHybridCommon: 9250db8073ad8ad7e84e4544c1f7b8ef6cd969af
-  RevenueCat: 7be0d7bde9efb2fc1ebd1888522c55bb4f9feb18
+  purchases_flutter: c583f4f60a316b9fb07b0b6d817016d79a2f411c
+  PurchasesHybridCommon: f161942f40eb37372c78d7c6524254b0b32ac752
+  RevenueCat: b552a07693b061ff7ea42c8c224f0613755aafe1
   shared_preferences_foundation: b4c3b4cddf1c21f02770737f147a3f5da9d39695
   url_launcher_macos: d2691c7dd33ed713bf3544850a623080ec693d95
 
 PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2

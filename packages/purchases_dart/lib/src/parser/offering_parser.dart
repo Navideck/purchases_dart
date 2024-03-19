@@ -1,7 +1,8 @@
+import 'package:purchases_dart/src/helper/logger.dart';
 import 'package:purchases_dart/src/model/raw_offerings.dart';
 import 'package:purchases_dart/src/store_product_interface.dart';
 
-import 'package:purchases_flutter/object_wrappers.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Parses a [RawOffering] into a [Offerings] object.
 class OfferingParser {
@@ -61,11 +62,19 @@ class OfferingParser {
     if (platformProductId == null) return null;
     var product = await _storeProduct.getStoreProducts(platformProductId);
     if (product == null) return null;
+    var presentedOfferingContext = product.presentedOfferingContext;
+    if (presentedOfferingContext == null) {
+      Logger.logEvent(
+        'OfferingParser: PresentedOfferingContext is null for package $identifier',
+        LogLevel.error,
+      );
+      return null;
+    }
     return Package(
       identifier,
       rawPackage.packageType,
       product,
-      offeringIdentifier,
+      presentedOfferingContext,
     );
   }
 }

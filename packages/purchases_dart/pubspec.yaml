@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
-  purchases_flutter: ^6.0.0
+  purchases_flutter: ^6.24.0
   shared_preferences: ^2.2.2
   uuid: ^4.3.3
   crypto: ^3.0.3

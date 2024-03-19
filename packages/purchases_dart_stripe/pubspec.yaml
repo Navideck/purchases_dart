@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
-  purchases_flutter: ^6.0.0 
+  purchases_flutter: ^6.24.0
   purchases_dart:
     git:
       url: git@github.com:Navideck/purchases_dart.git
