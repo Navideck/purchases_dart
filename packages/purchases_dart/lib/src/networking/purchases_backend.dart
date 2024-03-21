@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_dart/src/helper/purchase_error_code.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
+import 'package:purchases_dart/src/networking/error_interceptor.dart';
 import 'package:purchases_dart/src/networking/rc_http_status_code.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/parser/offering_parser.dart';
@@ -26,6 +27,9 @@ class PurchasesBackend {
           'Authorization': 'Bearer $apiKey'
         },
       ),
+    );
+    _httpClient.interceptors.add(
+      ErrorInterceptor(),
     );
     if (storeProduct != null) _offeringParser = OfferingParser(storeProduct!);
     _customerParser = CustomerParser();

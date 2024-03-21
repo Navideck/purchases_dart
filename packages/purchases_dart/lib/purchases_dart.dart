@@ -1,5 +1,6 @@
 library purchases_dart;
 
+export 'package:purchases_dart/src/networking/error_interceptor.dart';
 export 'package:purchases_dart/src/networking/purchases_backend.dart';
 export 'package:purchases_dart/src/model/purchases_header.dart';
 export 'package:purchases_dart/src/store_product_interface.dart';

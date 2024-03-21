@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:purchases_dart/src/helper/logger.dart';
+import 'package:flutter/services.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 class ErrorInterceptor extends Interceptor {
@@ -14,6 +14,10 @@ class ErrorInterceptor extends Interceptor {
         throw SendTimeOutException(err.requestOptions);
       case DioExceptionType.receiveTimeout:
         throw ReceiveTimeOutException(err.requestOptions);
+      case DioExceptionType.connectionError:
+        throw NoInternetConnectionException(err.requestOptions);
+      case DioExceptionType.badCertificate:
+        throw CertificateVerificationFailed(err.requestOptions);
       case DioExceptionType.badResponse:
         var responseData = err.response?.data;
         if (responseData != null) {
@@ -39,22 +43,29 @@ class ErrorInterceptor extends Interceptor {
         break;
       case DioExceptionType.unknown:
       default:
-        if (err.error.toString().contains('SocketException')) {
-          throw NoInternetConnectionException(err.requestOptions);
-        } else if (err.error.toString().contains('CERTIFICATE_VERIFY_FAILED')) {
-          throw CertificateVerificationFailed(err.requestOptions);
-        } else {
-          throw Exception(err.error);
-        }
+        throw Exception(err.error);
     }
-    if (err.type == DioExceptionType.cancel) {
-      Logger.logEvent(
-        "RequestCanceled -> ${err.requestOptions.uri.path}",
-        LogLevel.error,
-      );
-      return;
-    }
+    if (err.type == DioExceptionType.cancel) return;
     return handler.next(err);
+  }
+}
+
+/// Custom Exceptions
+
+// Replicates NetworkError from Purchases SDK
+class NoInternetConnectionException extends PlatformException {
+  static String errorMessage =
+      'No internet connection detected, please try again.';
+
+  NoInternetConnectionException(RequestOptions r)
+      : super(
+          code: PurchasesErrorCode.networkError.index.toString(),
+          message: errorMessage,
+        );
+
+  @override
+  String toString() {
+    return errorMessage;
   }
 }
 
@@ -127,18 +138,6 @@ class NotFoundException extends DioException {
   @override
   String toString() {
     return 'The requested information could not be found';
-  }
-}
-
-class NoInternetConnectionException extends DioException {
-  NoInternetConnectionException(RequestOptions r) : super(requestOptions: r);
-
-  static String errorMessage =
-      'No internet connection detected, please try again.';
-
-  @override
-  String toString() {
-    return errorMessage;
   }
 }
 
