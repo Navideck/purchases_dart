@@ -1,6 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/services.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 class ErrorInterceptor extends Interceptor {
   ErrorInterceptor();
@@ -9,59 +7,74 @@ class ErrorInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) {
     switch (err.type) {
       case DioExceptionType.connectionTimeout:
-        throw ConnectionTimeOutException(err.requestOptions);
+        return handler.reject(
+          ConnectionTimeOutException(err.requestOptions),
+        );
       case DioExceptionType.sendTimeout:
-        throw SendTimeOutException(err.requestOptions);
+        return handler.reject(
+          SendTimeOutException(err.requestOptions),
+        );
       case DioExceptionType.receiveTimeout:
-        throw ReceiveTimeOutException(err.requestOptions);
+        return handler.reject(
+          ReceiveTimeOutException(err.requestOptions),
+        );
       case DioExceptionType.connectionError:
-        throw NoInternetConnectionException(err.requestOptions);
+        return handler.reject(
+          NoInternetConnectionException(err.requestOptions),
+        );
       case DioExceptionType.badCertificate:
-        throw CertificateVerificationFailed(err.requestOptions);
+        return handler.reject(
+          CertificateVerificationFailed(err.requestOptions),
+        );
       case DioExceptionType.badResponse:
         var responseData = err.response?.data;
         if (responseData != null) {
-          throw DioException(
-            requestOptions: err.requestOptions,
-            error: responseData.toString(),
+          return handler.reject(
+            DioException(
+              requestOptions: err.requestOptions,
+              error: responseData.toString(),
+            ),
           );
         }
         switch (err.response?.statusCode) {
           case 400:
-            throw BadRequestException(err.requestOptions);
+            return handler.reject(
+              BadRequestException(err.requestOptions),
+            );
           case 401:
-            throw UnauthorizedException(err.requestOptions);
+            return handler.reject(
+              UnauthorizedException(err.requestOptions),
+            );
           case 404:
-            throw NotFoundException(err.requestOptions);
+            return handler.reject(
+              NotFoundException(err.requestOptions),
+            );
           case 409:
-            throw ConflictException(err.requestOptions);
+            return handler.reject(
+              ConflictException(err.requestOptions),
+            );
           case 500:
-            throw InternalServerErrorException(err.requestOptions);
+            return handler.reject(
+              InternalServerErrorException(err.requestOptions),
+            );
         }
         throw Exception(err.message);
       case DioExceptionType.cancel:
-        break;
       case DioExceptionType.unknown:
       default:
-        throw Exception(err.error);
+        return handler.reject(err);
     }
-    if (err.type == DioExceptionType.cancel) return;
-    return handler.next(err);
   }
 }
 
 /// Custom Exceptions
 
 // Replicates NetworkError from Purchases SDK
-class NoInternetConnectionException extends PlatformException {
+class NoInternetConnectionException extends DioException {
   static String errorMessage =
-      'No internet connection detected, please try again.';
+      'No internet connection detected, please try again';
 
-  NoInternetConnectionException(RequestOptions r)
-      : super(
-          code: PurchasesErrorCode.networkError.index.toString(),
-          message: errorMessage,
-        );
+  NoInternetConnectionException(RequestOptions r) : super(requestOptions: r);
 
   @override
   String toString() {
