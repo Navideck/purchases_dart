@@ -1,10 +1,10 @@
 # Firebase Function Stripe
 
-To handle stripe webhook and purchases
+To handle Stripe webhook and update RevenueCat
 
 ## Get Started
 
-Configure `stripe_key` `stripe_webhook_secret` and `revenuecat_api_key` in `index.js`
+Configure `stripe_key` `stripe_webhook_secret` and `revenuecat_api_key` in `functions/index.js`
 
 Make sure [node](https://nodejs.org/en) and [firebase](https://firebase.google.com/docs/cli) is installed
 
