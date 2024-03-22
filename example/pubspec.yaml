@@ -11,16 +11,10 @@ dependencies:
     sdk: flutter
   url_launcher: ^6.2.4
   purchases_flutter: ^6.24.0
-  purchases_dart_stripe:
-    path: ../packages/purchases_dart_stripe  
-  purchases_dart:
-    git:
-      url: git@github.com:Navideck/purchases_dart.git
-      path: packages/purchases_dart 
-
-dependency_overrides:
   purchases_dart:
     path: ../packages/purchases_dart
+  purchases_dart_stripe:
+    path: ../packages/purchases_dart_stripe
 
 dev_dependencies:
   flutter_test:

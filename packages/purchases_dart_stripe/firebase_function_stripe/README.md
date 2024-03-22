@@ -1,26 +1,32 @@
 # Firebase Function Stripe
 
-To handle Stripe webhook and update RevenueCat
+Handle Stripe webhooks and update RevenueCat.
 
-## Get Started
+## Getting Started
 
-Configure `stripe_key` `stripe_webhook_secret` and `revenuecat_api_key` in `functions/index.js`
+To get started, follow these steps:
 
-Make sure [node](https://nodejs.org/en) and [firebase](https://firebase.google.com/docs/cli) is installed
+1. Configure the following environment variables in `functions/index.js`:
+    - `stripe_key`: Your Stripe API key
+    - `stripe_webhook_secret`: Your Stripe webhook signing secret
+    - `revenuecat_api_key`: Your RevenueCat API key
 
-install node dependencies with `npm install` in `/functions` path
+2. Make sure you have Node.js and Firebase CLI installed on your machine.
 
-Add new firebase project: `firebase use --add`
+3. Install the Node.js dependencies by running `npm install` in the `/functions` directory.
 
-Deploy to cloud function: `firebase deploy`
+4. Add a new Firebase project by running `firebase use --add`.
 
-## Setup on Stripe
+5. Deploy the cloud function by running `firebase deploy`.
 
-After deployed to firebase, Get cloud function url and add that in Stripe's Webhook section with `/webhook` path
-eg: `https://CLOUD_FUNCTION_URL/app/webhook` with event: `checkout.session.completed`
+## Setting Up Stripe
 
-Note: after setting up webhook, get webhook's `signing secret` and add in function's `stripe_webhook_secret` and deploy again
+After deploying the Firebase function, follow these steps to set up Stripe:
+
+1. Get the cloud function URL and add it to the Stripe webhook section with the `/webhook` path. For example: `https://CLOUD_FUNCTION_URL/app/webhook`. Set the event to `checkout.session.completed`.
+
+2. After setting up the webhook, get the webhook's signing secret and add it to the `stripe_webhook_secret` variable in the `functions/index.js` file. Then, redeploy the function.
 
 ## Note
 
-index.js can also be used as a standalone expressJs application with little modification
+The `index.js` file can also be used as a standalone Express.js application with some modifications.

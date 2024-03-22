@@ -1,7 +1,7 @@
 # Purchases Dart
 
-Pure Dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) (aka RevenueCat) plugin.
+A pure Dart implementation of [purchases_flutter](https://pub.dev/packages/purchases_flutter) (aka RevenueCat).
 
 This repo hosts 2 packages:
-- [PurchasesDart](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart)
-- [PurchasesDartStripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe)
+- [Purchases Dart](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart)
+- [Purchases Dart Stripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe)

@@ -1,8 +1,12 @@
 name: purchases_dart_stripe
-description: "A new Flutter package project."
-version: 0.0.1
+description: "A pure Dart implementation of purchases_flutter(aka RevenueCat)."
+version: 1.0.0
 homepage:
-publish_to: "none" # Remove this line if you wish to publish to pub.dev
+homepage: https://navideck.com
+repository: https://github.com/Navideck/purchases_dart_stripe
+issue_tracker: https://github.com/Navideck/purchases_dart_stripe/issues
+funding:
+  - https://github.com/sponsors/Navideck
 
 environment:
   sdk: '>=3.2.5 <4.0.0'
@@ -13,14 +17,7 @@ dependencies:
     sdk: flutter
   dio: ^5.4.0
   purchases_flutter: ^6.24.0
-  purchases_dart: # TODO: replace with pub version
-    git:
-      url: git@github.com:Navideck/purchases_dart.git
-      path: packages/purchases_dart 
-
-dependency_overrides:
-  purchases_dart:
-    path: ../purchases_dart
+  purchases_dart: ^1.0.0
 
 dev_dependencies:
   flutter_test:
