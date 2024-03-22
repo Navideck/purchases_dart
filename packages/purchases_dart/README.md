@@ -1,6 +1,10 @@
 # PurchasesDart
 
-`PurchasesDart` is a pure Dart implementation of the `purchases_flutter` plugin, designed to facilitate in-app purchases and subscriptions. This plugin requires a `storeProduct` for communication with the store backend. It is platform-independent and can be integrated with various store implementations, such as Stripe, through `purchases_dart_stripe`.
+`PurchasesDart` is a pure Dart implementation of the `purchases_flutter` plugin, designed to facilitate in-app purchases and subscriptions. The `purchases_dart` package follows closely the native APIs from `purchases_flutter`. You can use it with all platforms Flutter supports, not just iOS and Android.
+
+`PurchasesDart` is designed to work with different payment gateways (stores) and can be integrated with various store implementations. We provide `purchases_dart_stripe` for out-of-the-box Stripe support. However, `purchases_dart` is not limited to a specific store and can be extended to support any store of your choice.
+
+It requires a `storeProduct` to communicate with the store backend. The `storeProduct` class serves as an interface for communication with different stores. For example, the `StripeStoreProduct` extends the `StoreProductInterface` for communication with the Stripe store backend. Similarly, if you want to build for the Play Store, you would need to create a `StoreProductInterface` implementation specific to the Play Store.
 
 ## Getting Started
 
@@ -16,13 +20,23 @@ await PurchasesDart.configure(
 );
 ```
 
+## Example app
+
+To run the example app, follow these steps:
+
+1. Open the `example` app folder.
+2. Rename `example/lib/env.example.dart` to `env.dart`.
+3. Configure your RevenueCat and Stripe keys in the `env.dart` file.
+
+That's it! You are now ready to use `purchases_dart` in your Dart projects.
+
 ## APIs
 
 `PurchasesDart` provides a range of APIs to manage in-app purchases and subscriptions:
 
 ### Configuration and Logging
 
-- **configure**: Initializes the plugin with the provided configuration.
+- **configure**: Initializes the package with the provided configuration.
 - **setLogLevel**: Sets the log level for debugging purposes.
 - **setLogHandler**: Sets a custom log handler.
 

@@ -1,10 +1,10 @@
 # Purchases Dart Stripe
 
-This is a Stripe store implementation for the `purchases_dart` plugin, enabling seamless integration of Stripe's payment processing capabilities with your Dart applications.
+This is a Stripe implementation as a payment gateway for `purchases_dart`, enabling seamless integration of Stripe's payment processing capabilities with your Dart applications while using RevenueCat as the source of truth for unlocked purchases.
 
 ## Getting Started
 
-To use this with the `purchases_dart` plugin, start by creating a Stripe store product interface:
+To use this with the `purchases_dart` package, start by creating a StripeStoreProduct interface:
 
 ```dart
 StoreProductInterface storeProduct = StripeStoreProduct(
