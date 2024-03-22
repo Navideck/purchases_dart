@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Stripe Payment</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script>
+      window.onload = function () {
+        console.log("Page has finished loading");
+        const appSchemeUrl = "{{appSchemeUrl}}";
+        if(appSchemeUrl != ""){
+          openApp(appSchemeUrl);
+        }
+      };
+      // Open App
+      function openApp(appSchemeUrl){
+          try{
+            window.location.href = appSchemeUrl;
+          }catch(e){
+            console.log(e);
+            // show dialog
+            alert("Please install the app to continue");
+          }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-header">
+        Payment Result {{result}}
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">
+          Thankyou for using our service
+        </h5>
+        <p class="card-text">Go back to App</p>
+        {% if appSchemeUrl != ""  %}
+          <button onclick="openApp('{{appSchemeUrl}}')" class="btn btn-primary">Go back to App</button>
+        {% endif %}
+      </div>
+    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+
+</html>
