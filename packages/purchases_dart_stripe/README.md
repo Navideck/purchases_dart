@@ -4,7 +4,7 @@ This is a Stripe implementation as a payment gateway for `purchases_dart`, enabl
 
 ## Getting Started
 
-To use this with the `purchases_dart` package, start by creating a StripeStoreProduct interface:
+To use this with the [purchases_dart](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart) package, start by creating a StripeStoreProduct interface:
 
 ```dart
 StoreProductInterface storeProduct = StripeStoreProduct(
@@ -15,9 +15,7 @@ StoreProductInterface storeProduct = StripeStoreProduct(
     return StripeCheckoutUrlBuilder(
       successUrl: 'https://example.com/success',
       cancelUrl: 'https://example.com/cancel',
-      mode: package.packageType == PackageType.lifetime
-          ? StripePaymentMode.payment
-          : StripePaymentMode.subscription,
+      mode: StripePaymentMode.subscription,
       lineItems: [
         StripeCheckoutLineItem(
           priceId: stripePriceId,
@@ -54,5 +52,7 @@ await PurchasesDart.configure(
 ```
 
 ## Note
+
+You have to setup Stripe webhook listener for payment confirmation to update revenueCat, checkout [docs](https://www.revenuecat.com/docs/getting-started/stripe#5-send-stripe-tokens-to-revenuecat)
 
 This implementation uses Stripe APIs to create new customers and identifies them using metadata to store the `appUserId` from RevenueCat in Stripe. This allows querying these users on Stripe with `"query": 'metadata["uid"]:"APP_USER_ID"'`. The `appUserId` serves as the source of truth between RevenueCat and Stripe, ensuring consistent user identification across mobile and other platforms.
