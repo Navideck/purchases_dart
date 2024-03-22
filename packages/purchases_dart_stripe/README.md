@@ -1,39 +1,62 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+## Purchases Dart Stripe
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
+Stripe store for `purchases_dart` plugin
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
+## Get Started
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Use with [purchases_dart]() plugin
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
+Create a Stripe store product interface first
 
 ```dart
-const like = 'sample';
+StoreProductInterface storeProduct = StripeStoreProduct(
+  stripeApi: 'STRIPE_API_KEY',
+  // Build checkout session for stripe, this will be called on using [PurchasesDart.purchasePackage] api, to build checkout url of that stripe product
+  // return map or [StripeCheckoutUrlBuilder.build()], available params: https://docs.stripe.com/api/checkout/sessions/object
+  checkoutSessionsBuilder: (Package package, String stripePriceId) async {
+    return StripeCheckoutUrlBuilder(
+      successUrl: 'https://example.com/success',
+      cancelUrl: 'https://example.com/cancel',
+      mode: package.packageType == PackageType.lifetime
+          ? StripePaymentMode.payment
+          : StripePaymentMode.subscription,
+      lineItems: [
+        StripeCheckoutLineItem(
+          priceId: stripePriceId,
+          quantity: 1,
+        ),
+      ],
+    ).build();
+  },
+  // Launch stripe checkout url in browser or in webView, this will be called after generating url using params from `checkoutSessionsBuilder`
+  onCheckoutUrlGenerated: (Package package, String sessionId, String url) {
+     launchUrlString(url),
+  },
+  // Optionally set customer builder, this will be called whenever a new appUserID from RevenueCat will be used on Stripe,
+  // Stripe will create a new customer for that appUserID, so use this callback to add more parameters to that new customer
+  // return a map, available params: https://docs.stripe.com/api/customers/create
+  stripeNewCustomerBuilder: (userId) async {
+    return StripeCustomerBuilder(
+        email: 'user@gmail.com',
+    ).build();
+   },
+);
 ```
 
-## Additional information
+Use this interface to configure PurchasesDart
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+await PurchasesDart.configure(
+  PurchasesDartConfiguration(
+    apiKey: env.revenueCatApiKey,
+    appUserId: userId,
+    storeProduct: storeProduct,
+  ),
+);
+```
+
+## Note
+
+Uses Stripe apis to create new customers, and to identify customer, uses metadata to store the appUserId from RevenueCat in stripe
+so we can query these users on stripe using, `"query": 'metadata["uid"]:"APP_USER_ID"'` on stripe, this appUserId is source of truth between RevenueCat and Stripe
+and use this same appUserId on mobile or other platforms
