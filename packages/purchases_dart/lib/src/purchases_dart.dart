@@ -54,7 +54,7 @@ class PurchasesDart {
   static void setLogHandler(LogHandler logHandler) =>
       Logger.logHandler = logHandler;
 
-  /// Gets current customer info
+  /// Gets current customer info. If the customer does not exist it will create one using the `appUserId` provided during configuration.
   static Future<CustomerInfo?> getCustomerInfo({
     PurchasesHeader? headers,
   }) async {
