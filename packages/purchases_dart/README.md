@@ -1,14 +1,10 @@
-## Purchases Dart
+# PurchasesDart
 
-Dart implementation of [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin
+`PurchasesDart` is a pure Dart implementation of the `purchases_flutter` plugin, designed to facilitate in-app purchases and subscriptions. This plugin requires a `storeProduct` for communication with the store backend. It is platform-independent and can be integrated with various store implementations, such as Stripe, through `purchases_dart_stripe`.
 
-## Get Started
+## Getting Started
 
-Configure `PurchasesDart` first with `PurchasesDartConfiguration`
-
-Requires `storeProduct` for communicating with the store, this plugin does not provide any store, and hence independent of platforms,
-
-We have StripeStore implementation [purchases_dart_stripe]() which can be used with `PurchasesDart` to implement Stripe
+Before using `PurchasesDart`, you must configure it with `PurchasesDartConfiguration`. This configuration requires an API key, a user ID, and a `storeProduct` instance. Below is an example of how to configure `PurchasesDart`:
 
 ```dart
 await PurchasesDart.configure(
@@ -20,45 +16,39 @@ await PurchasesDart.configure(
 );
 ```
 
-## Apis
+## APIs
 
-PurchasesDart supports these apis
+`PurchasesDart` provides a range of APIs to manage in-app purchases and subscriptions:
 
-Make sure to use appUserID in purchasesDart, AnonymousUserId is not recommended because, currently if user uninstalls application, there is no way to restore
-purchases of anonymous user
+### Configuration and Logging
 
-`configure`
+- **configure**: Initializes the plugin with the provided configuration.
+- **setLogLevel**: Sets the log level for debugging purposes.
+- **setLogHandler**: Sets a custom log handler.
 
-- Setup Logs
+### Customer Information
 
-`setLogLevel`
-`setLogHandler`
+- **getCustomerInfo**: Retrieves information about the customer.
+- **addCustomerInfoUpdateListener**: Registers a listener for customer information updates.
+- **removeCustomerInfoUpdateListener**: Unregisters a listener for customer information updates.
 
-- Get customer info
+### Offerings and Purchases
 
-`getCustomerInfo`
+- **getOfferings**: Fetches available offerings for purchase.
+- **purchasePackage**: Initiates the purchase of a package.
 
-- Fetch offerings
+### User Management
 
-`getOfferings`
+- **login**: Logs in a user with a specific ID.
+- **logout**: Logs out the current user.
+- **isAnonymous**: Checks if the current user is anonymous.
+- **updateAppUserId**: Updates the cached app user ID. Recommended over using `login` or `logout` as it only updates the app user ID locally.
 
-- Purchases login/logout apis
+## Important Notes
 
-`login`
-`logout`
+- It is crucial to use a consistent `appUserId` with `PurchasesDart`. Using `AnonymousUserId` is not recommended because there is currently no way to restore the purchases of an anonymous user if the application is uninstalled.
+- The `purchasePackage` API does not return customer information directly. The `StoreInterface` should provide a mechanism to update `customerInfoUpdate` after a purchase.
 
-- Check if current user is anonymous
-  `isAnonymous`
+## Integration with Stripe
 
-- updateAppUserId is recommended instead of using login or logout apis, as this will just update the cached appUserId locally
-
-`updateAppUserId`
-
-- purchasesPackage will not return customer, StoreInterface should provide a way to update customerInfoUpdate after purchase
-
-`purchasePackage`
-
-- StoreInterface should update customerInfo Listeners
-
-addCustomerInfoUpdateListener
-removeCustomerInfoUpdateListener
+For integrating Stripe as the store backend, please refer to the `purchases_dart_stripe` implementation. This additional package provides a `StripeStore` implementation that can be used with `PurchasesDart`.
