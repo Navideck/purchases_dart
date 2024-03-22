@@ -1,10 +1,14 @@
 import 'package:purchases_dart/src/store_product_interface.dart';
 
-/// required to pass [storeProduct],
-/// use [StoreProductInterface] for store product implementation
+/// Used when calling [configure] to configure the PurchasesDart plugin
 class PurchasesDartConfiguration {
+  /// RevenueCat API Key.
   final String apiKey;
+
+  /// Store product interface for communicating with the underlying store.
   final StoreProductInterface storeProduct;
+
+  /// An optional unique id for identifying the user.
   final String? appUserId;
 
   PurchasesDartConfiguration({

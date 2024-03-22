@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+/// Header for Purchases, use to override default headers.
 class PurchasesHeader {
   String? platform;
   String? apiKey;

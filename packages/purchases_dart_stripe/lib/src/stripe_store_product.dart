@@ -102,8 +102,8 @@ class StripeStoreProduct extends StoreProductInterface {
     if (checkoutSessionsBuilder == null) {
       throw Exception('checkoutSessionsBuilder is null');
     }
-    String? priceId =
-        packageToPurchase.storeProduct.presentedOfferingIdentifier;
+    String? priceId = packageToPurchase
+        .storeProduct.presentedOfferingContext?.offeringIdentifier;
     if (priceId == null) {
       throw Exception('Stripe priceId not found');
     }
@@ -236,6 +236,8 @@ class StripeStoreProduct extends StoreProductInterface {
   }
 }
 
+/// Newly created customer on Stripe takes time sometimes to update on APi's
+/// use cache for 1 minute to avoid creating multiple customers
 class _StripeCustomerCache {
   String userId;
   StripeCustomer? stripeCustomer;

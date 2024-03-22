@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   dio: ^5.4.0
   purchases_flutter: ^6.24.0
-  purchases_dart:
+  purchases_dart: # TODO: replace with pub version
     git:
       url: git@github.com:Navideck/purchases_dart.git
       path: packages/purchases_dart 

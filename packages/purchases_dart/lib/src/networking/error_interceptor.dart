@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
 
+/// ErrorInterceptor for handling errors in Dio,
+/// and converting them to custom exceptions.
 class ErrorInterceptor extends Interceptor {
   ErrorInterceptor();
 
@@ -68,8 +70,6 @@ class ErrorInterceptor extends Interceptor {
 }
 
 /// Custom Exceptions
-
-// Replicates NetworkError from Purchases SDK
 class NoInternetConnectionException extends DioException {
   static String errorMessage =
       'No internet connection detected, please try again';

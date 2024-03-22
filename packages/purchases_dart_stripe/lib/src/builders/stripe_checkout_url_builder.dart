@@ -1,3 +1,4 @@
+/// Builder for creating a Stripe Checkout URL
 class StripeCheckoutUrlBuilder {
   String successUrl;
   String cancelUrl;

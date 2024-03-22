@@ -31,8 +31,10 @@ class GetOfferings extends Endpoint {
   final String userId;
 
   GetOfferings(this.userId)
-      : super("/subscribers/${Uri.encodeComponent(userId)}/offerings",
-            "get_offerings");
+      : super(
+          "/subscribers/${Uri.encodeComponent(userId)}/offerings",
+          "get_offerings",
+        );
 }
 
 class LogIn extends Endpoint {
@@ -51,8 +53,10 @@ class PostAttributes extends Endpoint {
   final String userId;
 
   PostAttributes(this.userId)
-      : super("/subscribers/${Uri.encodeComponent(userId)}/attributes",
-            "post_attributes");
+      : super(
+          "/subscribers/${Uri.encodeComponent(userId)}/attributes",
+          "post_attributes",
+        );
 }
 
 class GetAmazonReceipt extends Endpoint {
@@ -60,11 +64,16 @@ class GetAmazonReceipt extends Endpoint {
   final String receiptId;
 
   GetAmazonReceipt(this.userId, this.receiptId)
-      : super("/receipts/amazon/$userId/$receiptId", "get_amazon_receipt");
+      : super(
+          "/receipts/amazon/$userId/$receiptId",
+          "get_amazon_receipt",
+        );
 }
 
 class GetProductEntitlementMapping extends Endpoint {
   GetProductEntitlementMapping()
       : super(
-            "/product_entitlement_mapping", "get_product_entitlement_mapping");
+          "/product_entitlement_mapping",
+          "get_product_entitlement_mapping",
+        );
 }
