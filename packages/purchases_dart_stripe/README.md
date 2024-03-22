@@ -55,4 +55,6 @@ await PurchasesDart.configure(
 
 You have to setup Stripe webhook listener for payment confirmation to update revenueCat, checkout [docs](https://www.revenuecat.com/docs/getting-started/stripe#5-send-stripe-tokens-to-revenuecat)
 
-This implementation uses Stripe APIs to create new customers and identifies them using metadata to store the `appUserId` from RevenueCat in Stripe. This allows querying these users on Stripe with `"query": 'metadata["uid"]:"APP_USER_ID"'`. The `appUserId` serves as the source of truth between RevenueCat and Stripe, ensuring consistent user identification across mobile and other platforms.
+Alternatively, you can utilize our [firebase_function_stripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe/firebase_function_stripe) example. This provides a demonstration of how to configure Stripe and RevenueCat using Firebase Cloud Functions, with minor modifications, this can also be used as a standalone Node.js server.
+
+PurchasesDartStripe uses Stripe APIs to create new customers and identifies them using metadata to store the `appUserId` from RevenueCat in Stripe. This allows querying these users on Stripe with `"query": 'metadata["uid"]:"APP_USER_ID"'`. The `appUserId` serves as the source of truth between RevenueCat and Stripe, ensuring consistent user identification across mobile and other platforms.
