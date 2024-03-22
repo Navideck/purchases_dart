@@ -1,9 +1,13 @@
 {
     "cSpell.words": [
         "ETAG",
+        "etags",
+        "liquidjs",
         "livemode",
         "pointycastle",
-        "RCHTTP"
+        "predeploy",
+        "RCHTTP",
+        "revenuecat"
     ],
     "cmake.configureOnOpen": false
 }
