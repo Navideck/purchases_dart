@@ -16,11 +16,11 @@ await PurchasesDart.configure(
 );
 ```
 
-It requires a `storeProduct` to communicate with the store backend. The `storeProduct` class serves as an interface for communication with different stores. For example, the [StripeStoreProduct](https://github.com/Navideck/purchases_dart/blob/add_docs/packages/purchases_dart_stripe/lib/src/stripe_store_product.dart) from [purchases_dart_stripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe) extends the `StoreProductInterface` for communication with the Stripe store backend. Similarly, if you want to build for the Play Store, you would need to create a `StoreProductInterface` implementation specific to the Play Store.
+It requires a `storeProduct` to communicate with the store backend. The `storeProduct` class serves as an interface for communication with different stores. For example, the [StripeStoreProduct](https://github.com/Navideck/purchases_dart/blob/add_docs/packages/purchases_dart_stripe/lib/src/stripe_store_product.dart) from [purchases_dart_stripe](https://pub.dev/packages/purchases_dart_stripe) extends the `StoreProductInterface` for communication with the Stripe store backend. Similarly, if you want to build for the Play Store, you would need to create a `StoreProductInterface` implementation specific to the Play Store.
 
 ## Integration with Stripe
 
-For integrating Stripe as the store backend, please refer to the [purchases_dart_stripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe) implementation. This additional package provides a `StripeStore` implementation that can be used with `PurchasesDart`.
+For integrating Stripe as the store backend, please refer to the [purchases_dart_stripe](https://pub.dev/packages/purchases_dart_stripe) implementation. This additional package provides a `StripeStore` implementation that can be used with `PurchasesDart`.
 
 ## Important Notes
 

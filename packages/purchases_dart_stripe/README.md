@@ -4,7 +4,7 @@ This is a Stripe implementation as a payment gateway for `purchases_dart`, enabl
 
 ## Getting Started
 
-To use this with the [purchases_dart](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart) package, start by creating a StripeStoreProduct interface:
+To use this with the [purchases_dart](https://pub.dev/packages/purchases_dart) package, start by creating a StripeStoreProduct interface:
 
 ```dart
 StoreProductInterface storeProduct = StripeStoreProduct(
