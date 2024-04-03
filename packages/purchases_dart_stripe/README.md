@@ -7,8 +7,7 @@ This is a Stripe implementation as a payment gateway for `purchases_dart`, enabl
 To use this with the [purchases_dart](https://pub.dev/packages/purchases_dart) package, start by creating a StripeStoreProduct interface:
 
 ```dart
-/// Use Stripe SecretApiKey, Not recommended in production, instead use your own [ApiClient] for proxy
-/// or use [StripeBackendInterface] for your own implementation
+/// Use Stripe's Secret API Key for testing only. In production, replace with a secure [ApiClient] to handle requests indirectly, or implement [StripeBackendInterface] for custom integration.
 StoreProductInterface storeProduct = StripeStoreProduct(
   stripeApi: 'STRIPE_API_KEY',
   // Build a checkout session for Stripe. This is called when using the [PurchasesDart.purchasePackage] API to build the checkout URL for a Stripe product.
