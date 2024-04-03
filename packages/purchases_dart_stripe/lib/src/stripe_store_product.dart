@@ -22,7 +22,7 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 /// Setup [StripeNewCustomerBuilder] to add extra data for a new stripe customer
 /// available params: https://docs.stripe.com/api/customers/create
 ///
-/// Either pass a `stripeApi` or use your own httpClient to implement proxy or other operations
+/// Either pass a `stripeApiKey` or use your own `httpClient` to implement proxy or other operations
 class StripeStoreProduct extends StoreProductInterface {
   final List<_StripeCustomerCache> _stripeCustomers = [];
   CheckoutSessionsBuilder? checkoutSessionsBuilder;
@@ -52,7 +52,7 @@ class StripeStoreProduct extends StoreProductInterface {
       );
       log("StripeStoreProduct: Using default stripe backend");
     } else {
-      throw "Either httpClient or stripeApi must be passed";
+      throw "Either httpClient or stripeApiKey must be passed";
     }
   }
 

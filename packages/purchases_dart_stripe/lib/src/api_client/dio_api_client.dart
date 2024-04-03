@@ -8,12 +8,12 @@ import 'package:purchases_dart_stripe/src/api_client/api_client.dart';
 class DioApiClient extends ApiClient {
   late Dio _httpClient;
 
-  DioApiClient(String stripeApi) {
+  DioApiClient(String stripeApiKey) {
     _httpClient = Dio(
       BaseOptions(
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Bearer $stripeApi'
+          'Authorization': 'Bearer $stripeApiKey'
         },
       ),
     );
