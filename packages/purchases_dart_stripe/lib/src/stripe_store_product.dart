@@ -32,7 +32,7 @@ class StripeStoreProduct extends StoreProductInterface {
   late StripeBackendInterface _stripe;
 
   StripeStoreProduct({
-    String? stripeApi,
+    String? stripeApiKey,
     this.checkoutSessionsBuilder,
     this.onCheckoutUrlGenerated,
     this.currencyFormatter,
@@ -46,9 +46,9 @@ class StripeStoreProduct extends StoreProductInterface {
     } else if (httpClient != null) {
       _stripe = StripeDefaultBackend(httpClient);
       log("StripeStoreProduct: Using custom httpClient");
-    } else if (stripeApi != null) {
+    } else if (stripeApiKey != null) {
       _stripe = StripeDefaultBackend(
-        DioApiClient(stripeApi),
+        DioApiClient(stripeApiKey),
       );
       log("StripeStoreProduct: Using default stripe backend");
     } else {
