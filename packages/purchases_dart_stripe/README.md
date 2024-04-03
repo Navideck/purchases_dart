@@ -4,11 +4,14 @@ This is a Stripe implementation as a payment gateway for `purchases_dart`, enabl
 
 ## Getting Started
 
-To use this with the [purchases_dart](https://pub.dev/packages/purchases_dart) package, start by creating a StripeStoreProduct interface:
+To use this with the [purchases_dart](https://pub.dev/packages/purchases_dart) package, start by creating a StripeStoreProduct interface.
+
+Use Stripe's Secret API Key for testing only. In production, use [apiClient] to proxy requests without exposing your Stripe secret key or implement [StripeBackendInterface] for custom integration.
 
 ```dart
+// 
 StoreProductInterface storeProduct = StripeStoreProduct(
-  stripeApi: 'STRIPE_API_KEY',
+  stripeApiKey: 'STRIPE_API_KEY',
   // Build a checkout session for Stripe. This is called when using the [PurchasesDart.purchasePackage] API to build the checkout URL for a Stripe product.
   // Returns a map or [StripeCheckoutUrlBuilder.build()], with available params detailed at: https://docs.stripe.com/api/checkout/sessions/object
   checkoutSessionsBuilder: (Package package, String stripePriceId) async {
@@ -53,8 +56,10 @@ await PurchasesDart.configure(
 
 ## Note
 
-You have to setup Stripe webhook listener for payment confirmation to update revenueCat, checkout [docs](https://www.revenuecat.com/docs/getting-started/stripe#5-send-stripe-tokens-to-revenuecat)
+You have to setup Stripe webhook listener for payment confirmation to update RevenueCat, check out [RevenueCat's docs](https://www.revenuecat.com/docs/getting-started/stripe#5-send-stripe-tokens-to-revenuecat).
 
 Alternatively, you can utilize our [firebase_function_stripe](https://github.com/Navideck/purchases_dart/tree/add_docs/packages/purchases_dart_stripe/firebase_function_stripe) example. This provides a demonstration of how to configure Stripe and RevenueCat using Firebase Cloud Functions, with minor modifications, this can also be used as a standalone Node.js server.
+
+Create a Stripe Restricted key with these permissions: `Customers`: Write, `Customer session`: Write, `Checkout Sessions`: Write ,`Products`: Read, `Prices`: Read
 
 PurchasesDartStripe uses Stripe APIs to create new customers and identifies them using metadata to store the `appUserId` from RevenueCat in Stripe. This allows querying these users on Stripe with `"query": 'metadata["uid"]:"APP_USER_ID"'`. The `appUserId` serves as the source of truth between RevenueCat and Stripe, ensuring consistent user identification across mobile and other platforms.

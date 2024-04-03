@@ -58,7 +58,7 @@ class _MainAppState extends State<MainApp> {
     PurchasesDart.setLogLevel(LogLevel.verbose);
 
     StoreProductInterface storeProduct = StripeStoreProduct(
-      stripeApi: env.stripeApiKey,
+      stripeApiKey: env.stripeApiKey,
       checkoutSessionsBuilder: _buildStripeCheckoutData,
       onCheckoutUrlGenerated: (Package package, String sessionId, String url) =>
           launchUrlString(url),

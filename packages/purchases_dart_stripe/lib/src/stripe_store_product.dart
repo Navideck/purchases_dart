@@ -1,11 +1,14 @@
 import 'dart:developer';
 
-import 'package:dio/dio.dart';
 import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart_stripe/src/api_client/api_client.dart';
+import 'package:purchases_dart_stripe/src/api_client/dio_api_client.dart';
+import 'package:purchases_dart_stripe/src/backend/stripe_interface.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_currency.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_customer.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_price.dart';
 import 'package:purchases_dart_stripe/src/models/stripe_product.dart';
+import 'package:purchases_dart_stripe/src/backend/stripe_default_backend.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Setup [CheckoutSessionsBuilder] to generate checkout session data for an item or use [StripeCheckoutUrlBuilder] for basic implementation
@@ -19,32 +22,38 @@ import 'package:purchases_flutter/purchases_flutter.dart';
 /// Setup [StripeNewCustomerBuilder] to add extra data for a new stripe customer
 /// available params: https://docs.stripe.com/api/customers/create
 ///
+/// Either pass a `stripeApiKey` or use your own `httpClient` to implement proxy or other operations
 class StripeStoreProduct extends StoreProductInterface {
-  late Dio _httpClient;
   final List<_StripeCustomerCache> _stripeCustomers = [];
-
   CheckoutSessionsBuilder? checkoutSessionsBuilder;
   CheckoutUrlGenerated? onCheckoutUrlGenerated;
   StripeCurrencyFormatter? currencyFormatter;
   StripeNewCustomerBuilder? stripeNewCustomerBuilder;
+  late StripeBackendInterface _stripe;
 
   StripeStoreProduct({
-    required String stripeApi,
+    String? stripeApiKey,
     this.checkoutSessionsBuilder,
     this.onCheckoutUrlGenerated,
     this.currencyFormatter,
     this.stripeNewCustomerBuilder,
+    ApiClient? apiClient,
+    StripeBackendInterface? stripeBackendInterface,
   }) {
-    _httpClient = Dio(
-      BaseOptions(
-        baseUrl: 'https://api.stripe.com/v1',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Bearer $stripeApi'
-        },
-      ),
-    );
-    _httpClient.interceptors.add(_ErrorInterceptor());
+    if (stripeBackendInterface != null) {
+      _stripe = stripeBackendInterface;
+      log("StripeStoreProduct: Using custom Stripe backend");
+    } else if (apiClient != null) {
+      _stripe = StripeDefaultBackend(apiClient);
+      log("StripeStoreProduct: Using custom httpClient");
+    } else if (stripeApiKey != null) {
+      _stripe = StripeDefaultBackend(
+        DioApiClient(stripeApiKey),
+      );
+      log("StripeStoreProduct: Using default Stripe backend");
+    } else {
+      throw "Either httpClient or stripeApiKey must be passed";
+    }
   }
 
   @override
@@ -79,20 +88,6 @@ class StripeStoreProduct extends StoreProductInterface {
   }
 
   @override
-  Future<List<StoreTransaction>> queryAllPurchases(String userId) async {
-    StripeCustomer? stripeCustomer = await _getStripeCustomer(userId);
-    if (stripeCustomer == null) return [];
-    final subscriptionsResponse =
-        await _httpClient.get('/subscriptions?customer=${stripeCustomer.id}');
-    var subscriptionsJson = subscriptionsResponse.data;
-    if (subscriptionsJson == null) return [];
-    var subscriptionData = subscriptionsJson['data'];
-    if (subscriptionData == null || subscriptionData is! List) return [];
-    // TODO: covert subscriptionData to StoreTransaction
-    throw UnimplementedError();
-  }
-
-  @override
   Future purchasePackage(
     Package packageToPurchase,
     String userId,
@@ -117,31 +112,18 @@ class StripeStoreProduct extends StoreProductInterface {
     );
     data['customer'] = stripeCustomer.id;
     data['client_reference_id'] = userId;
-    final checkoutSessionResponse = await _httpClient.post(
-      '/checkout/sessions',
-      data: data,
-    );
-
-    String? url = checkoutSessionResponse.data?['url'];
-    String? sessionId = checkoutSessionResponse.data?['id'];
+    final checkoutSessionResponse = await _stripe.buildCheckoutSession(data);
+    String? url = checkoutSessionResponse?['url'];
+    String? sessionId = checkoutSessionResponse?['id'];
     if (url == null || sessionId == null) {
       throw Exception('Failed to generate checkout url');
     }
     onCheckoutUrlGenerated?.call(packageToPurchase, sessionId, url);
   }
 
-  Future<bool> purchasedPackages(String userId) async {
-    StripeCustomer? stripeCustomer = await _getStripeCustomer(userId);
-    if (stripeCustomer == null) {
-      throw Exception('StripeCustomer not found for $userId');
-    }
-    final subscriptionsResponse =
-        await _httpClient.get('/subscriptions?customer=${stripeCustomer.id}');
-    var subscriptionsJson = subscriptionsResponse.data;
-    if (subscriptionsJson == null) return false;
-    var subscriptionData = subscriptionsJson['data'];
-    if (subscriptionData == null || subscriptionData is! List) return false;
-    return true;
+  @override
+  Future<List<StoreTransaction>> queryAllPurchases(String userId) async {
+    throw UnimplementedError();
   }
 
   /// Update customerInfo listeners from [PurchasesDart]
@@ -158,35 +140,26 @@ class StripeStoreProduct extends StoreProductInterface {
     if (stripeCustomer == null) {
       throw Exception('StripeCustomer not found for $userId');
     }
-    final response = await _httpClient.post('/billing_portal/sessions', data: {
-      "customer": stripeCustomer.id,
-      "return_url": returnUrl,
-    });
-    return response.data['url'];
+    return _stripe.getBillingSession(
+      stripeCustomer.id!,
+      returnUrl: returnUrl,
+    );
   }
 
   /// Expire checkout session
   Future<void> expireCheckoutSession(String sessionId) async {
-    await _httpClient.post('/checkout/sessions/$sessionId/expire');
+    await _stripe.expireCheckoutSession(sessionId);
   }
 
   /// Helpers
   ///
   /// Get StripeProduct from Stripe API
-  Future<StripeProduct?> _getStripeProduct(String productId) async {
-    final productResponse = await _httpClient.get('/products/$productId');
-    var productsJson = productResponse.data;
-    if (productsJson == null) return null;
-    return StripeProduct.fromJson(productsJson);
-  }
+  Future<StripeProduct?> _getStripeProduct(String productId) =>
+      _stripe.getStripeProduct(productId);
 
   /// Get StripePrice from Stripe API
-  Future<StripePrice?> _getStripePrice(String priceId) async {
-    final priceResponse = await _httpClient.get('/prices/$priceId');
-    var priceJson = priceResponse.data;
-    if (priceJson == null) return null;
-    return StripePrice.fromJson(priceJson);
-  }
+  Future<StripePrice?> _getStripePrice(String priceId) =>
+      _stripe.getStripePrice(priceId);
 
   /// Get StripeCustomer from Stripe API linked with [userId]
   Future<StripeCustomer?> _getStripeCustomer(String userId) async {
@@ -198,25 +171,10 @@ class StripeStoreProduct extends StoreProductInterface {
     if (cacheCustomer?.isExpired() == true) {
       _stripeCustomers.remove(cacheCustomer);
     }
-
-    final customers = await _httpClient.get(
-      '/customers/search',
-      data: {
-        "query": 'metadata["uid"]:"$userId"',
-      },
-    );
-
-    var customersData = customers.data?['data'];
-    if (customersData == null || customersData is! List) return null;
-    StripeCustomer stripeCustomer;
-    if (customersData.isEmpty) {
-      stripeCustomer = await _createStripeCustomer(userId);
-    } else {
-      if (customersData.length > 1) {
-        log('Multiple customers found for $userId');
-      }
-      stripeCustomer = StripeCustomer.fromJson(customersData.first);
-    }
+    StripeCustomer? stripeCustomer = await _stripe.searchStripeCustomer({
+      "query": 'metadata["uid"]:"$userId"',
+    });
+    stripeCustomer ??= await _createStripeCustomer(userId);
     _stripeCustomers.add(_StripeCustomerCache(userId, stripeCustomer));
     return stripeCustomer;
   }
@@ -230,9 +188,12 @@ class StripeStoreProduct extends StoreProductInterface {
     customerExtraData?.forEach((key, value) {
       if (value != null) data[key] = value;
     });
-    log('Creating new stripe customer for $userId : $data');
-    final response = await _httpClient.post('/customers', data: data);
-    return StripeCustomer.fromJson(response.data);
+    log('Creating new Stripe customer for $userId : $data');
+    StripeCustomer? customer = await _stripe.createStripeCustomer(data);
+    if (customer == null) {
+      throw Exception('Failed to create Stripe customer for $userId');
+    }
+    return customer;
   }
 }
 
@@ -281,42 +242,3 @@ typedef StripeCurrencyFormatter = StripeCurrency Function(
   int amount,
   String currency,
 );
-
-class _ErrorInterceptor extends Interceptor {
-  _ErrorInterceptor();
-
-  @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    switch (err.type) {
-      case DioExceptionType.connectionTimeout:
-        throw "Connection Timeout";
-      case DioExceptionType.sendTimeout:
-        throw "Send Timeout";
-      case DioExceptionType.receiveTimeout:
-        throw "Receive Timeout";
-      case DioExceptionType.badResponse:
-        var responseData = err.response?.data;
-        if (responseData != null) {
-          throw Exception(responseData.toString());
-        } else if (err.message != null) {
-          throw Exception(err.message);
-        }
-        throw Exception("Bad Response");
-      case DioExceptionType.cancel:
-        break;
-      case DioExceptionType.unknown:
-      default:
-        if (err.error.toString().contains('SocketException')) {
-          throw "Please check your internet connection";
-        } else if (err.error.toString().contains('CERTIFICATE_VERIFY_FAILED')) {
-          throw "Certificate verification failed";
-        } else {
-          throw Exception(err.error);
-        }
-    }
-    if (err.type == DioExceptionType.cancel) {
-      return;
-    }
-    return handler.next(err);
-  }
-}

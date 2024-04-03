@@ -26,6 +26,14 @@ const revenueCatAxios = require("axios").create({
   },
 });
 
+const stripeProxyAxios = require("axios").create({
+  headers: {
+    "X-Platform": "stripe",
+    "Content-Type": "application/x-www-form-urlencoded",
+    Authorization: `Bearer ${appConfig.stripe_key}`,
+  },
+});
+
 // Set the engine to render liquid templates
 app.engine("liquid", engine.express());
 app.set("views", "./views");
@@ -93,6 +101,37 @@ app.get("/stripe_result*", async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(400).send();
+  }
+});
+
+// Handle Stripe ProxyCalls
+app.post("/post", async (req, res) => {
+  try {
+    const url = req.body.url;
+    const data = req.body.data;
+    const response = await stripeProxyAxios.post(url, data);
+    res.json(response.data);
+  } catch (err) {
+    const errorMessage = err.response?.data?.error?.message || err.message;
+    console.log(`Post: ${errorMessage}`);
+    res.status(err?.status || 404).json({
+      error: errorMessage,
+    });
+  }
+});
+
+app.post("/get", async (req, res) => {
+  try {
+    const url = req.body.url;
+    const data = req.body.data;
+    const response = await stripeProxyAxios.get(url, { data: data });
+    res.json(response.data);
+  } catch (err) {
+    const errorMessage = err.response?.data?.error?.message || err.message;
+    console.log(`Get: ${errorMessage}`);
+    res.status(err?.status || 404).json({
+      error: errorMessage,
+    });
   }
 });
 

@@ -7,6 +7,14 @@ issue_tracker: https://github.com/Navideck/purchases_dart/issues
 funding:
   - https://github.com/sponsors/Navideck
 
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
 environment:
   sdk: '>=3.2.5 <4.0.0'
 
