@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:purchases_dart_stripe/purchases_dart_stripe.dart';
 
-/// [ProxyApiClient] can be used to make stripe api calls through a proxy server.
+/// [ProxyApiClient] can be used to make Stripe api calls through a proxy server.
 class ProxyApiClient extends ApiClient {
   late Dio _httpClient;
   final String proxyUrl;

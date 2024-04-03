@@ -37,20 +37,20 @@ class StripeStoreProduct extends StoreProductInterface {
     this.onCheckoutUrlGenerated,
     this.currencyFormatter,
     this.stripeNewCustomerBuilder,
-    ApiClient? httpClient,
-    StripeBackendInterface? stripe,
+    ApiClient? apiClient,
+    StripeBackendInterface? stripeBackendInterface,
   }) {
-    if (stripe != null) {
-      _stripe = stripe;
-      log("StripeStoreProduct: Using custom stripe backend");
-    } else if (httpClient != null) {
-      _stripe = StripeDefaultBackend(httpClient);
+    if (stripeBackendInterface != null) {
+      _stripe = stripeBackendInterface;
+      log("StripeStoreProduct: Using custom Stripe backend");
+    } else if (apiClient != null) {
+      _stripe = StripeDefaultBackend(apiClient);
       log("StripeStoreProduct: Using custom httpClient");
     } else if (stripeApiKey != null) {
       _stripe = StripeDefaultBackend(
         DioApiClient(stripeApiKey),
       );
-      log("StripeStoreProduct: Using default stripe backend");
+      log("StripeStoreProduct: Using default Stripe backend");
     } else {
       throw "Either httpClient or stripeApiKey must be passed";
     }
@@ -188,10 +188,10 @@ class StripeStoreProduct extends StoreProductInterface {
     customerExtraData?.forEach((key, value) {
       if (value != null) data[key] = value;
     });
-    log('Creating new stripe customer for $userId : $data');
+    log('Creating new Stripe customer for $userId : $data');
     StripeCustomer? customer = await _stripe.createStripeCustomer(data);
     if (customer == null) {
-      throw Exception('Failed to create stripe customer for $userId');
+      throw Exception('Failed to create Stripe customer for $userId');
     }
     return customer;
   }
