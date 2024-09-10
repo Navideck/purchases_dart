@@ -10,7 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.2.4
-  purchases_flutter: ^6.24.0
+  purchases_flutter: ^8.1.0
   purchases_dart: ^1.0.0
   purchases_dart_stripe:
     path: ../packages/purchases_dart_stripe
