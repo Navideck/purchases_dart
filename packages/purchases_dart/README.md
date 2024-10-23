@@ -1,6 +1,6 @@
 # PurchasesDart
 
-`PurchasesDart` is a pure Dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin, designed to facilitate in-app purchases and subscriptions. The `purchases_dart` package follows closely the native APIs from `purchases_flutter`. You can use it with all platforms Flutter supports, not just iOS and Android. it is designed to work with different payment gateways (stores) and can be integrated with various store implementations.
+`PurchasesDart` is a pure Dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin, designed to facilitate in-app purchases and subscriptions. The `purchases_dart` package follows closely the native APIs from `purchases_flutter`. You can use it with all platforms Flutter supports, not just iOS and Android. It is designed to work with different payment gateways (stores) and can be integrated with various store implementations.
 
 ## Getting Started
 
