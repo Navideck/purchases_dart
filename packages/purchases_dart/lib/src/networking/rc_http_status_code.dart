@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-class RCHTTPStatusCodes {
+class RcHttpStatusCodes {
   static const int SUCCESS = 200;
   static const int CREATED = 201;
   static const int UNSUCCESSFUL = 300;

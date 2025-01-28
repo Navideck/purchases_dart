@@ -7,7 +7,6 @@
         "livemode",
         "pointycastle",
         "predeploy",
-        "RCHTTP",
         "revenuecat"
     ],
     "cmake.configureOnOpen": false

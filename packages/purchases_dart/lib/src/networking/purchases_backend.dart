@@ -88,7 +88,7 @@ class PurchasesBackend {
       ).toPlatformException();
     }
     return LogInResult(
-      created: response.statusCode == RCHTTPStatusCodes.CREATED,
+      created: response.statusCode == RcHttpStatusCodes.CREATED,
       customerInfo: customerInfo,
     );
   }
