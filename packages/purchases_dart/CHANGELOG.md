@@ -1,5 +1,6 @@
 ## 1.0.5
 * Bump purchases_flutter
+* Fix metadata parsing
 * Change RCHTTP character case
 * Remove dead code
 
