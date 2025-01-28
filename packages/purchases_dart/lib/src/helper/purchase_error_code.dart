@@ -39,27 +39,31 @@ class PurchasesDartErrorCode {
       PurchasesDartErrorCode(1, 'Purchase was cancelled.');
   static const PurchasesDartErrorCode StoreProblemError =
       PurchasesDartErrorCode(2, 'There was a problem with the store.');
-  static const PurchasesDartErrorCode PurchaseNotAllowedError = PurchasesDartErrorCode(
-      3, 'The device or user is not allowed to make the purchase.');
-  static const PurchasesDartErrorCode PurchaseInvalidError = PurchasesDartErrorCode(
-      4, 'One or more of the arguments provided are invalid.');
+  static const PurchasesDartErrorCode PurchaseNotAllowedError =
+      PurchasesDartErrorCode(
+          3, 'The device or user is not allowed to make the purchase.');
+  static const PurchasesDartErrorCode PurchaseInvalidError =
+      PurchasesDartErrorCode(
+          4, 'One or more of the arguments provided are invalid.');
   static const PurchasesDartErrorCode ProductNotAvailableForPurchaseError =
       PurchasesDartErrorCode(5, 'The product is not available for purchase.');
   static const PurchasesDartErrorCode ProductAlreadyPurchasedError =
       PurchasesDartErrorCode(6, 'This product is already active for the user.');
-  static const PurchasesDartErrorCode ReceiptAlreadyInUseError = PurchasesDartErrorCode(
-      7, 'There is already another active subscriber using the same receipt.');
+  static const PurchasesDartErrorCode ReceiptAlreadyInUseError =
+      PurchasesDartErrorCode(7,
+          'There is already another active subscriber using the same receipt.');
   static const PurchasesDartErrorCode InvalidReceiptError =
       PurchasesDartErrorCode(8, 'The receipt is not valid.');
   static const PurchasesDartErrorCode MissingReceiptFileError =
       PurchasesDartErrorCode(9, 'The receipt is missing.');
   static const PurchasesDartErrorCode NetworkError =
       PurchasesDartErrorCode(10, 'Error performing request.');
-  static const PurchasesDartErrorCode InvalidCredentialsError = PurchasesDartErrorCode(
-      11,
-      'There was a credentials issue. Check the underlying error for more details.');
+  static const PurchasesDartErrorCode InvalidCredentialsError =
+      PurchasesDartErrorCode(11,
+          'There was a credentials issue. Check the underlying error for more details.');
   static const PurchasesDartErrorCode UnexpectedBackendResponseError =
-      PurchasesDartErrorCode(12, 'Received unexpected response from the backend.');
+      PurchasesDartErrorCode(
+          12, 'Received unexpected response from the backend.');
   static const PurchasesDartErrorCode InvalidAppUserIdError =
       PurchasesDartErrorCode(14, 'The app user id is not valid.');
   static const PurchasesDartErrorCode OperationAlreadyInProgressError =
@@ -86,7 +90,8 @@ class PurchasesDartErrorCode {
   static const PurchasesDartErrorCode LogOutWithAnonymousUserError =
       PurchasesDartErrorCode(
           22, 'Called logOut but the current user is anonymous.');
-  static const PurchasesDartErrorCode ConfigurationError = PurchasesDartErrorCode(23,
+  static const PurchasesDartErrorCode ConfigurationError = PurchasesDartErrorCode(
+      23,
       'There is an issue with your configuration. Check the underlying error for more details.');
   static const PurchasesDartErrorCode UnsupportedError = PurchasesDartErrorCode(
     24,
@@ -96,8 +101,9 @@ class PurchasesDartErrorCode {
   static const PurchasesDartErrorCode EmptySubscriberAttributesError =
       PurchasesDartErrorCode(
           25, 'A request for subscriber attributes returned none.');
-  static const PurchasesDartErrorCode CustomerInfoError = PurchasesDartErrorCode(
-      28, 'There was a problem related to the customer info.');
+  static const PurchasesDartErrorCode CustomerInfoError =
+      PurchasesDartErrorCode(
+          28, 'There was a problem related to the customer info.');
   static const PurchasesDartErrorCode SignatureVerificationError =
       PurchasesDartErrorCode(
     36,

@@ -63,7 +63,7 @@ class ErrorInterceptor extends Interceptor {
         throw Exception(err.message);
       case DioExceptionType.cancel:
       case DioExceptionType.unknown:
-      return handler.reject(err);
+        return handler.reject(err);
     }
   }
 }
