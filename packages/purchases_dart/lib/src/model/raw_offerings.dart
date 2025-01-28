@@ -42,7 +42,10 @@ class RawOffering {
     return RawOffering(
       description: json["description"],
       identifier: json["identifier"],
-      metadata: json["metadata"] ?? {},
+      metadata: json["metadata"] != null
+          ? (json["metadata"] as Map<String, dynamic>)
+              .map((key, value) => MapEntry(key, value as Object))
+          : {},
       packages: json["packages"] == null
           ? []
           : List<RawPackage>.from(
