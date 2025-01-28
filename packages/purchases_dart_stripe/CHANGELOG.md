@@ -1,3 +1,6 @@
+## 1.0.5
+* Bump purchases_flutter
+
 ## 1.0.4
 * Bump purchases_flutter
 

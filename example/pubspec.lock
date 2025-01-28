@@ -254,14 +254,14 @@ packages:
       path: "../packages/purchases_dart"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "1.0.5"
   purchases_dart_stripe:
     dependency: "direct main"
     description:
       path: "../packages/purchases_dart_stripe"
       relative: true
     source: path
-    version: "1.0.4"
+    version: "1.0.5"
   purchases_flutter:
     dependency: "direct main"
     description:

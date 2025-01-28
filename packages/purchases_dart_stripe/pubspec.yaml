@@ -1,6 +1,6 @@
 name: purchases_dart_stripe
 description: "A Stripe store implementation meant to be used with purchases_dart"
-version: 1.0.4
+version: 1.0.5
 homepage: https://navideck.com
 repository: https://github.com/Navideck/purchases_dart
 issue_tracker: https://github.com/Navideck/purchases_dart/issues
@@ -23,7 +23,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^5.4.0
-  purchases_flutter: ^8.1.0
+  purchases_flutter: ^8.4.3
   purchases_dart: ^1.0.0
 
 dev_dependencies:
