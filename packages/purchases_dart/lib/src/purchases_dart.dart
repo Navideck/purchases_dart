@@ -1,8 +1,10 @@
+import 'package:purchases_dart/src/helper/attributes_manager.dart';
 import 'package:purchases_dart/src/helper/cache_manager.dart';
 import 'package:purchases_dart/src/helper/identity_manager.dart';
 import 'package:purchases_dart/src/helper/logger.dart';
 import 'package:purchases_dart/src/model/purchases_header.dart';
 import 'package:purchases_dart/src/model/raw_customer.dart';
+import 'package:purchases_dart/src/model/subscribe_attributes_key.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/purchases_dart_configuration.dart';
@@ -17,6 +19,7 @@ class PurchasesDart {
   static final Set _customerInfoUpdateListeners = {};
   static late StoreProductInterface _storeProduct;
   static late CacheManager _cacheManager;
+  static late AttributeManager _attributeManager;
   static late IdentityManager _identityManager;
 
   /// Gets the current appUserID.
@@ -36,6 +39,7 @@ class PurchasesDart {
       storeProduct: configuration.storeProduct,
     );
     _identityManager = IdentityManager(_cacheManager, _backend!);
+    _attributeManager = AttributeManager(_backend!);
     _storeProduct = configuration.storeProduct;
     _storeProduct.onCustomerInfoUpdate = _updateCustomerInfoListeners;
     _identityManager.configure(configuration.appUserId);
@@ -121,6 +125,39 @@ class PurchasesDart {
     return await _storeProduct.purchasePackage(
       packageToPurchase,
       appUserId!,
+    );
+  }
+
+  /// Subscriber attribute associated with the Firebase Instance Id for the user
+  /// Required for the RevenueCat Firebase integration
+  ///
+  /// [firebaseAppInstanceId] Empty String or null will delete the subscriber attribute.
+  /// This wont sync automatically when userId changes..
+  static Future<void> setFirebaseAppInstanceId(
+    String? firebaseAppInstanceId,
+  ) async {
+    _validateConfig();
+    await _attributeManager.setAttributionID(
+      ReservedSubscriberAttribute.FIREBASE_APP_INSTANCE_ID,
+      firebaseAppInstanceId,
+      appUserId!,
+    );
+  }
+
+  /// Subscriber attributes are useful for storing additional, structured information on a user.
+  /// Since attributes are writable using a public key they should not be used for
+  /// managing secure or sensitive information such as subscription status, coins, etc.
+  ///
+  /// Key names starting with "$" are reserved names used by RevenueCat. For a full list of key
+  /// restrictions refer to our guide: https://docs.revenuecat.com/docs/subscriber-attributes
+  ///
+  /// [attributes] Map of attributes by key. Set the value as an empty string to delete an attribute.
+  /// This wont sync automatically when userId changes..
+  Future<void> setAttributionID(Map<String, String> attributes) async {
+    _validateConfig();
+    await _attributeManager.setAttributes(
+      appUserId!,
+      attributes,
     );
   }
 

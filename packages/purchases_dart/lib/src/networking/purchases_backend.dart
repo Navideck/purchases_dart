@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_dart/src/helper/purchase_error_code.dart';
+import 'package:purchases_dart/src/model/subscribe_attribute.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
 import 'package:purchases_dart/src/networking/rc_http_status_code.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
@@ -90,6 +91,26 @@ class PurchasesBackend {
     return LogInResult(
       created: response.statusCode == RcHttpStatusCodes.CREATED,
       customerInfo: customerInfo,
+    );
+  }
+
+  Future<void> postAttributes(
+    String userId, {
+    required Map<String, String?> attributesToSet,
+    PurchasesHeader? headers,
+  }) async {
+    final attributes = attributesToSet.map(
+      (key, value) => MapEntry(key, SubscriberAttribute(key, value)),
+    );
+
+    final backendMap = attributes.map(
+      (key, attribute) => MapEntry(key, attribute.toBackendMap()),
+    );
+
+    await _httpClient.post(
+      PostAttributes(userId).path,
+      options: headers?.dioOptions,
+      data: backendMap,
     );
   }
 

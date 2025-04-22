@@ -1,13 +1,18 @@
 {
-    "cSpell.words": [
-        "axios",
-        "ETAG",
-        "etags",
-        "liquidjs",
-        "livemode",
-        "pointycastle",
-        "predeploy",
-        "revenuecat"
-    ],
-    "cmake.configureOnOpen": false
+  "cSpell.words": [
+    "axios",
+    "ETAG",
+    "etags",
+    "idfa",
+    "idfv",
+    "kochava",
+    "liquidjs",
+    "livemode",
+    "mparticle",
+    "pointycastle",
+    "predeploy",
+    "revenuecat",
+    "tenjin"
+  ],
+  "cmake.configureOnOpen": false
 }
