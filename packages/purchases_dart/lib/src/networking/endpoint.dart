@@ -27,6 +27,11 @@ class PostReceipt extends Endpoint {
   PostReceipt() : super("/receipts", "post_receipt");
 }
 
+class PostRedeemWebPurchase extends Endpoint {
+  PostRedeemWebPurchase()
+      : super("/subscribers/redeem_purchase", "post_redeem_web_purchase");
+}
+
 class GetOfferings extends Endpoint {
   final String userId;
 
@@ -34,6 +39,16 @@ class GetOfferings extends Endpoint {
       : super(
           "/subscribers/${Uri.encodeComponent(userId)}/offerings",
           "get_offerings",
+        );
+}
+
+class GetProducts extends Endpoint {
+  final String userId;
+  final List<String> platformProductIdentifiers;
+  GetProducts(String baseUrl, this.userId, this.platformProductIdentifiers)
+      : super(
+          "$baseUrl/subscribers/${Uri.encodeComponent(userId)}/products?${platformProductIdentifiers.map((e) => "id=${Uri.encodeComponent(e)}").join("&")}",
+          "get_products",
         );
 }
 

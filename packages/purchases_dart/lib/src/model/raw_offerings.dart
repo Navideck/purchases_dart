@@ -31,11 +31,15 @@ class RawOffering {
     required this.identifier,
     required this.metadata,
     required this.packages,
+    this.webCheckoutUrl,
+    this.webCheckoutUrls,
   });
 
   final String? description;
   final String? identifier;
   final Map<String, Object> metadata;
+  final String? webCheckoutUrl;
+  final Map<String, String>? webCheckoutUrls;
   final List<RawPackage> packages;
 
   factory RawOffering.fromJson(Map<String, dynamic> json) {
@@ -50,6 +54,11 @@ class RawOffering {
           ? []
           : List<RawPackage>.from(
               json["packages"]!.map((x) => RawPackage.fromJson(x))),
+      webCheckoutUrl: json["web_checkout_url"],
+      webCheckoutUrls: json["web_checkout_urls"] != null
+          ? (json["web_checkout_urls"] as Map<String, dynamic>)
+              .map((key, value) => MapEntry(key, value as String))
+          : null,
     );
   }
 
@@ -66,17 +75,20 @@ class RawPackage {
     required this.identifier,
     required this.platformProductIdentifier,
     required this.platformProductPlanIdentifier,
+    this.webCheckoutUrl,
   });
 
   final String? identifier;
   final String? platformProductIdentifier;
   final String? platformProductPlanIdentifier;
+  final String? webCheckoutUrl;
 
   factory RawPackage.fromJson(Map<String, dynamic> json) {
     return RawPackage(
       identifier: json["identifier"],
       platformProductIdentifier: json["platform_product_identifier"],
       platformProductPlanIdentifier: json["platform_product_plan_identifier"],
+      webCheckoutUrl: json["web_checkout_url"],
     );
   }
 

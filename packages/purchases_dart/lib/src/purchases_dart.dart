@@ -8,16 +8,12 @@ import 'package:purchases_dart/src/model/subscribe_attributes_key.dart';
 import 'package:purchases_dart/src/networking/purchases_backend.dart';
 import 'package:purchases_dart/src/parser/customer_parser.dart';
 import 'package:purchases_dart/src/purchases_dart_configuration.dart';
-import 'package:purchases_dart/src/store_product_interface.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Entry point for PurchasesDart.
 class PurchasesDart {
   static PurchasesBackend? _backend;
-  static CustomerInfo? _lastReceivedCustomerInfo;
   static final CustomerParser _customerParser = CustomerParser();
-  static final Set _customerInfoUpdateListeners = {};
-  static late StoreProductInterface _storeProduct;
   static late CacheManager _cacheManager;
   static late AttributeManager _attributeManager;
   static late IdentityManager _identityManager;
@@ -35,13 +31,10 @@ class PurchasesDart {
     if (_backend != null) throw Exception("PurchasesDart already configured");
     _cacheManager = await CacheManager.instance;
     _backend = PurchasesBackend(
-      apiKey: configuration.apiKey,
-      storeProduct: configuration.storeProduct,
+      apiKey: configuration.webBillingApiKey,
     );
     _identityManager = IdentityManager(_cacheManager, _backend!);
     _attributeManager = AttributeManager(_backend!);
-    _storeProduct = configuration.storeProduct;
-    _storeProduct.onCustomerInfoUpdate = _updateCustomerInfoListeners;
     _identityManager.configure(configuration.appUserId);
   }
 
@@ -62,9 +55,9 @@ class PurchasesDart {
   static Future<CustomerInfo?> getCustomerInfo({
     PurchasesHeader? headers,
   }) async {
-    _validateConfig();
+    String userId = _validateConfigAndGetUserId();
     return await _backend?.getCustomerInfo(
-      appUserId!,
+      userId,
       headers: headers,
     );
   }
@@ -76,9 +69,9 @@ class PurchasesDart {
   static Future<Offerings?> getOfferings({
     PurchasesHeader? headers,
   }) async {
-    _validateConfig();
+    String userId = _validateConfigAndGetUserId();
     return await _backend?.getOfferings(
-      appUserId!,
+      userId,
       headers: headers,
     );
   }
@@ -95,7 +88,7 @@ class PurchasesDart {
   @Deprecated(
       'Login method using undocumented APIs which might change or stop working, set appUserId in configure instead, or to change id of current user, use updateAppUserId method.')
   static Future<LogInResult> login(String newAppUserId) async {
-    _validateConfig(newAppUserId);
+    _validateConfigAndGetUserId(newAppUserId);
     return _identityManager.logIn(newAppUserId);
   }
 
@@ -110,7 +103,7 @@ class PurchasesDart {
   /// Update app user id, this will change the current app user id locally
   /// This will not change the app user id in the RevenueCat backend
   static Future<void> updateAppUserId(String appUserId) async {
-    _validateConfig(appUserId);
+    _validateConfigAndGetUserId(appUserId);
     await _identityManager.updateAppUserId(appUserId);
   }
 
@@ -120,12 +113,34 @@ class PurchasesDart {
   /// the purchase.
   ///
   /// [packageToPurchase] The Package you wish to purchase
-  static Future<void> purchasePackage(Package packageToPurchase) async {
-    _validateConfig();
-    return await _storeProduct.purchasePackage(
-      packageToPurchase,
-      appUserId!,
-    );
+  // static Future<void> purchasePackage(Package packageToPurchase) async {
+  //   _validateConfigAndGetUserId();
+  //   throw UnimplementedError(
+  //     "This method is not implemented, please use getWebBillingUrl to get the web billing url and redirect the user to it",
+  //   );
+  // }
+
+  /// Get the web billing url for a package
+  ///
+  /// [package] The Package you wish to get the web billing url for
+  /// [email] The email of the user you wish to purchase the package for
+  static Future<Uri?> getWebBillingUrl(
+    Package package, {
+    String? email,
+  }) async {
+    String userId = _validateConfigAndGetUserId();
+    var urls = await _backend?.getWebBillingUrl(userId, package);
+    Uri? resultUrl = urls?.production;
+    if (_backend?.isSandbox == true && urls?.sandbox != null) {
+      resultUrl = urls?.sandbox;
+    }
+    if (resultUrl != null) {
+      resultUrl = resultUrl.replace(queryParameters: {
+        ...resultUrl.queryParameters,
+        if (email != null) "email": email,
+      });
+    }
+    return resultUrl;
   }
 
   /// Subscriber attribute associated with the Firebase Instance Id for the user
@@ -136,11 +151,11 @@ class PurchasesDart {
   static Future<void> setFirebaseAppInstanceId(
     String? firebaseAppInstanceId,
   ) async {
-    _validateConfig();
+    String userId = _validateConfigAndGetUserId();
     await _attributeManager.setAttributionID(
       ReservedSubscriberAttribute.FIREBASE_APP_INSTANCE_ID,
       firebaseAppInstanceId,
-      appUserId!,
+      userId,
     );
   }
 
@@ -154,61 +169,44 @@ class PurchasesDart {
   /// [attributes] Map of attributes by key. Set the value as an empty string to delete an attribute.
   /// This wont sync automatically when userId changes..
   Future<void> setAttributionID(Map<String, String> attributes) async {
-    _validateConfig();
+    String userId = _validateConfigAndGetUserId();
     await _attributeManager.setAttributes(
-      appUserId!,
+      userId,
       attributes,
     );
   }
 
-  /// Sets a function to be called on updated customer info.
-  ///
-  /// The function is called right away with the latest customer info as soon
-  /// as it's set.
-  ///
-  /// [customerInfoUpdateListener] CustomerInfo update listener.
-  static void addCustomerInfoUpdateListener(
-    CustomerInfoUpdateListener customerInfoUpdateListener,
-  ) {
-    _customerInfoUpdateListeners.add(customerInfoUpdateListener);
-    final lastReceivedCustomerInfo = _lastReceivedCustomerInfo;
-    if (lastReceivedCustomerInfo != null) {
-      customerInfoUpdateListener(lastReceivedCustomerInfo);
+  static Future<WebPurchaseRedemption?> parseAsWebPurchaseRedemption(
+    String urlString,
+  ) async {
+    Uri uri = Uri.parse(urlString);
+    const redeemWebPurchaseHost = "redeem_web_purchase";
+    if (uri.host == redeemWebPurchaseHost) {
+      var redemptionToken = uri.queryParameters["redemption_token"];
+      if (redemptionToken != null) {
+        return WebPurchaseRedemption(redemptionToken);
+      }
     }
-  }
-
-  /// Removes a given CustomerInfoUpdateListener
-  ///
-  /// [customerInfoUpdateListener] CustomerInfoUpdateListener reference of the listener to remove.
-  static void removeCustomerInfoUpdateListener(
-    CustomerInfoUpdateListener customerInfoUpdateListener,
-  ) {
-    _customerInfoUpdateListeners.remove(customerInfoUpdateListener);
+    return null;
   }
 
   /// Creates a [CustomerInfo] object from a json object
   static CustomerInfo? createCustomer(Map<String, dynamic> json) =>
       _customerParser.createCustomer(RawCustomer.fromJson(json));
 
-  /// Update customerInfo listeners
-  static void _updateCustomerInfoListeners(CustomerInfo customerInfo) async {
-    _lastReceivedCustomerInfo = customerInfo;
-    for (final listener in _customerInfoUpdateListeners) {
-      listener(customerInfo);
-    }
-  }
-
   /// Validates the configuration, throws an exception if the configuration is not valid
-  static _validateConfig([String? userId]) {
+  static String _validateConfigAndGetUserId([String? userId]) {
     if (_backend == null) {
       throw Exception(
         "PurchasesDart.configure() must be called before calling any other methods",
       );
     }
-    if (userId == null && appUserId == null) {
+    String? validUserId = userId ?? appUserId;
+    if (validUserId == null) {
       throw Exception(
-        "Failed to get userId, please set in configure method",
+        "Failed to get userId, please set in configure method or pass userId to the method",
       );
     }
+    return validUserId;
   }
 }

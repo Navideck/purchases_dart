@@ -3,9 +3,8 @@
 import 'package:example/env.dart' as env;
 import 'package:flutter/material.dart';
 import 'package:purchases_dart/purchases_dart.dart';
-import 'package:purchases_dart_stripe/purchases_dart_stripe.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() {
   runApp(
@@ -30,46 +29,13 @@ class _MainAppState extends State<MainApp> {
   CustomerInfo? customerInfo;
   bool isLoading = false;
 
-  Future<Map<String, dynamic>> _buildStripeCheckoutData(
-    Package package,
-    String stripePriceId,
-  ) async {
-    return StripeCheckoutUrlBuilder(
-      successUrl: 'https://example.com/success',
-      cancelUrl: 'https://example.com/cancel',
-      mode: package.packageType == PackageType.lifetime
-          ? StripePaymentMode.payment
-          : StripePaymentMode.subscription,
-      lineItems: [
-        StripeCheckoutLineItem(
-          priceId: stripePriceId,
-          quantity: 1,
-        ),
-      ],
-    ).build();
-  }
-
   Future<void> _initialize() async {
-    PurchasesDart.addCustomerInfoUpdateListener((customerInfo) {
-      print("CustomerInfoUpdateListener");
-      print(customerInfo.toJson());
-    });
-
     PurchasesDart.setLogLevel(LogLevel.verbose);
-
-    StoreProductInterface storeProduct = StripeStoreProduct(
-      stripeApiKey: env.stripeApiKey,
-      checkoutSessionsBuilder: _buildStripeCheckoutData,
-      onCheckoutUrlGenerated: (Package package, String sessionId, String url) =>
-          launchUrlString(url),
-    );
 
     // configure PurchasesDart
     await PurchasesDart.configure(
       PurchasesDartConfiguration(
-        apiKey: env.revenueCatApiKey,
-        // appUserId: userId,
-        storeProduct: storeProduct,
+        webBillingApiKey: env.webBillingApiKey,
       ),
     );
 
@@ -87,7 +53,7 @@ class _MainAppState extends State<MainApp> {
     setState(() => isLoading = true);
     try {
       CustomerInfo? customerInfo = await PurchasesDart.getCustomerInfo();
-      print(customerInfo?.toJson());
+      print(customerInfo);
       setState(() {
         isLoading = false;
         this.customerInfo = customerInfo;
@@ -103,7 +69,7 @@ class _MainAppState extends State<MainApp> {
     setState(() => isLoading = true);
     try {
       Offerings? offerings = await PurchasesDart.getOfferings();
-      print(offerings?.toJson());
+      print(offerings);
       setState(() {
         this.offerings = offerings;
         isLoading = false;
@@ -117,7 +83,15 @@ class _MainAppState extends State<MainApp> {
   void _purchasePackage(Package package) async {
     setState(() => isLoading = true);
     try {
-      await PurchasesDart.purchasePackage(package);
+      Uri? webBillingUrl = await PurchasesDart.getWebBillingUrl(
+        package,
+        //  email: "testuser@gmail.com",
+      );
+      if (webBillingUrl != null) {
+        await launchUrl(webBillingUrl);
+      } else {
+        throw Exception("Failed to get web billing url");
+      }
       setState(() => isLoading = false);
     } catch (e) {
       setState(() => isLoading = false);
@@ -262,7 +236,10 @@ class OfferingsWidget extends StatelessWidget {
                       return ListTile(
                         onTap: () => onPackageTap(package),
                         title: Text(package.storeProduct.title),
-                        subtitle: Text(package.storeProduct.description),
+                        subtitle: Text(
+                          "${package.presentedOfferingContext.offeringIdentifier}\n"
+                          "${package.storeProduct.priceString}",
+                        ),
                       );
                     }).toList(),
                   ],

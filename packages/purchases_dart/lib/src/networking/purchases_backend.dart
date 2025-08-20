@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:purchases_dart/purchases_dart.dart';
+import 'package:purchases_dart/src/helper/api_key_helper.dart';
 import 'package:purchases_dart/src/helper/purchase_error_code.dart';
+import 'package:purchases_dart/src/model/raw_product.dart';
 import 'package:purchases_dart/src/model/subscribe_attribute.dart';
 import 'package:purchases_dart/src/networking/endpoint.dart';
 import 'package:purchases_dart/src/networking/rc_http_status_code.dart';
@@ -14,26 +16,32 @@ class PurchasesBackend {
   late Dio _httpClient;
   OfferingParser? _offeringParser;
   CustomerParser? _customerParser;
-  StoreProductInterface? storeProduct;
+
+  final String _rcBaseUrl = 'https://api.revenuecat.com/v1';
+  final String _rcBillingBaseUrl = 'https://api.revenuecat.com/rcbilling/v1';
+  late final bool isSandbox;
 
   PurchasesBackend({
     required String apiKey,
-    required this.storeProduct,
   }) {
+    if (!isWebBillingApiKey(apiKey)) {
+      throw Exception("web billing api key is not valid");
+    }
+    isSandbox = isWebBillingSandboxApiKey(apiKey);
     _httpClient = Dio(
       BaseOptions(
-        baseUrl: 'https://api.revenuecat.com/v1',
+        baseUrl: _rcBaseUrl,
         headers: {
-          'X-Platform': 'stripe',
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $apiKey'
+          'X-Platform': 'web-billing',
+          'Authorization': 'Bearer $apiKey',
         },
       ),
     );
     _httpClient.interceptors.add(
       ErrorInterceptor(),
     );
-    if (storeProduct != null) _offeringParser = OfferingParser(storeProduct!);
+    _offeringParser = OfferingParser();
     _customerParser = CustomerParser();
   }
 
@@ -53,7 +61,45 @@ class PurchasesBackend {
     PurchasesHeader? headers,
   }) async {
     final rawOfferings = await getRawOfferings(userId, headers: headers);
-    return await _offeringParser?.createOfferings(rawOfferings);
+    final rawProducts = await getRawProducts(
+      userId,
+      rawOfferings: rawOfferings,
+      headers: headers,
+    );
+    return await _offeringParser?.createOfferings(rawOfferings, rawProducts);
+  }
+
+  Future<({Uri? production, Uri? sandbox})?> getWebBillingUrl(
+      String userId, Package package) async {
+    final rawOfferings = await getRawOfferings(userId);
+    String offeringId = package.presentedOfferingContext.offeringIdentifier;
+    for (var offering in rawOfferings.offerings) {
+      if (offering.identifier == offeringId) {
+        for (var rawPackage in offering.packages) {
+          if (rawPackage.identifier == package.identifier) {
+            String? sandboxUrl = offering.webCheckoutUrls?['sandbox'];
+            String? productionUrl = rawPackage.webCheckoutUrl;
+            Uri? productionUri;
+            Uri? sandboxUri;
+            if (sandboxUrl != null) {
+              sandboxUri = Uri.parse(sandboxUrl);
+              sandboxUri = sandboxUri.replace(queryParameters: {
+                ...sandboxUri.queryParameters,
+                'package_id': package.identifier,
+              });
+            }
+            if (productionUrl != null) {
+              productionUri = Uri.parse(productionUrl);
+            }
+            return (
+              production: productionUri,
+              sandbox: sandboxUri,
+            );
+          }
+        }
+      }
+    }
+    return null;
   }
 
   Future<RawOfferings> getRawOfferings(
@@ -65,6 +111,41 @@ class PurchasesBackend {
       options: headers?.dioOptions,
     );
     return RawOfferings.fromJson(response.data);
+  }
+
+  Future<List<RawProduct>> getRawProducts(
+    String userId, {
+    required RawOfferings rawOfferings,
+    PurchasesHeader? headers,
+  }) async {
+    Set<String> platformProductIdentifiers = {};
+    for (var element in rawOfferings.offerings) {
+      for (var package in element.packages) {
+        String? platformProductIdentifier = package.platformProductIdentifier;
+        if (platformProductIdentifier != null) {
+          platformProductIdentifiers.add(platformProductIdentifier);
+        }
+      }
+    }
+    final response = await _httpClient.get(
+      GetProducts(
+        _rcBillingBaseUrl,
+        userId,
+        platformProductIdentifiers.toList(),
+      ).path,
+      options: headers?.dioOptions,
+    );
+
+    var productDetails = response.data["product_details"];
+    if (productDetails == null ||
+        productDetails is! List ||
+        productDetails.isEmpty) {
+      return [];
+    }
+
+    return List<RawProduct>.from(
+      productDetails.map((product) => RawProduct.fromJson(product)),
+    );
   }
 
   Future<LogInResult> logIn({
@@ -112,11 +193,5 @@ class PurchasesBackend {
       options: headers?.dioOptions,
       data: backendMap,
     );
-  }
-
-  Future<void> syncPurchases(String userId) async {
-    // List<StoreTransaction> storeTransactions =
-    await storeProduct?.queryAllPurchases(userId);
-    // final response = await _httpClient.get(SyncPurchases(userId).path);
   }
 }

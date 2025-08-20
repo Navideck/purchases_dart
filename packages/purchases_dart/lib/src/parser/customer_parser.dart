@@ -170,8 +170,8 @@ class CustomerParser {
       RawSubscriptionObject subscriptionObject) {
     String? transactionIdentifier = subscriptionObject.storeTransactionId;
     if (transactionIdentifier == null) return null;
-    return StoreTransaction.create(
-      transactionIdentifier,
+
+    return StoreTransaction(
       transactionIdentifier,
       subscriptionObject.identifier,
       subscriptionObject.purchaseDate?.toString() ?? "",
