@@ -8,7 +8,7 @@ class Logger {
   static LogHandler logHandler = defaultLogHandler;
 
   /// Log event with [message] and [logLevel]
-  static void logEvent(message, [LogLevel logLevel = LogLevel.debug]) {
+  static void logEvent(Object message, [LogLevel logLevel = LogLevel.debug]) {
     if ((Logger.logLevel != LogLevel.verbose && logLevel != Logger.logLevel)) {
       return;
     }
