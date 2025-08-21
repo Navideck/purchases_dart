@@ -59,12 +59,14 @@ class PurchasesBackend {
   Future<Offerings?> getOfferings(
     String userId, {
     PurchasesHeader? headers,
+    String? currency,
   }) async {
     final rawOfferings = await getRawOfferings(userId, headers: headers);
     final rawProducts = await getRawProducts(
       userId,
       rawOfferings: rawOfferings,
       headers: headers,
+      currency: currency,
     );
     return await _offeringParser?.createOfferings(rawOfferings, rawProducts);
   }
@@ -113,10 +115,12 @@ class PurchasesBackend {
     return RawOfferings.fromJson(response.data);
   }
 
+  /// Set `currency` to `null` to use auto pick currency.
   Future<List<RawProduct>> getRawProducts(
     String userId, {
     required RawOfferings rawOfferings,
     PurchasesHeader? headers,
+    required String? currency,
   }) async {
     Set<String> platformProductIdentifiers = {};
     for (var element in rawOfferings.offerings) {
@@ -133,6 +137,9 @@ class PurchasesBackend {
         userId,
         platformProductIdentifiers.toList(),
       ).path,
+      queryParameters: {
+        if (currency != null) 'currency': currency,
+      },
       options: headers?.dioOptions,
     );
 
