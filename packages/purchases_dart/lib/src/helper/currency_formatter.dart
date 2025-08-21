@@ -1,6 +1,6 @@
 import 'package:purchases_dart/src/model/raw_product.dart';
 
-String? formatWebBillingPice(ProductPrice price) {
+String? formatWebBillingPrice(ProductPrice price) {
   int? amount = price.amount;
   String? currency = price.currency;
   if (amount == null || currency == null) {

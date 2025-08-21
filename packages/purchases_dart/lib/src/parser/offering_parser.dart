@@ -109,7 +109,7 @@ class OfferingParser {
       return null;
     }
 
-    String? priceString = formatWebBillingPice(productPrice);
+    String? priceString = formatWebBillingPrice(productPrice);
 
     return Package(
       identifier,
