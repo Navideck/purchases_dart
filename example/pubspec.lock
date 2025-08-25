@@ -251,7 +251,7 @@ packages:
   purchases_dart:
     dependency: "direct main"
     description:
-      path: "../packages/purchases_dart"
+      path: ".."
       relative: true
     source: path
     version: "1.0.6"

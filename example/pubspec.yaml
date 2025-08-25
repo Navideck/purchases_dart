@@ -12,7 +12,7 @@ dependencies:
   url_launcher: ^6.2.4
   purchases_flutter:
   purchases_dart:
-    path: ../packages/purchases_dart
+    path: ../
 
 dev_dependencies:
   flutter_test:
