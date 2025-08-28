@@ -259,10 +259,10 @@ packages:
     dependency: "direct main"
     description:
       name: purchases_flutter
-      sha256: "239aae77964d4e6da88f1b870259df7c1325dcad7187d257a024b885d85534eb"
+      sha256: "4ba63cb8b4a032adf65e786deb05ae2339454bf98c027662b65db08e71b82bc9"
       url: "https://pub.dev"
     source: hosted
-    version: "9.2.1"
+    version: "9.2.3"
   shared_preferences:
     dependency: transitive
     description:
@@ -275,10 +275,10 @@ packages:
     dependency: transitive
     description:
       name: shared_preferences_android
-      sha256: "5bcf0772a761b04f8c6bf814721713de6f3e5d9d89caf8d3fe031b02a342379e"
+      sha256: a2608114b1ffdcbc9c120eb71a0e207c71da56202852d4aab8a5e30a82269e74
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.11"
+    version: "2.4.12"
   shared_preferences_foundation:
     dependency: transitive
     description:
@@ -400,10 +400,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "0aedad096a85b49df2e4725fa32118f9fa580f3b14af7a2d2221896a02cd5656"
+      sha256: "69ee86740f2847b9a4ba6cffa74ed12ce500bbe2b07f3dc1e643439da60637b7"
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.17"
+    version: "6.3.18"
   url_launcher_ios:
     dependency: transitive
     description:
