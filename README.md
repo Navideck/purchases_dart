@@ -1,6 +1,6 @@
 # PurchasesDart
 
-`PurchasesDart` is a dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin, designed to facilitate in-app purchases and subscriptions with `WebBilling`. The `purchases_dart` package follows closely the native APIs from `purchases_flutter`.
+`PurchasesDart` is a Dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin, designed to facilitate in-app purchases and subscriptions with `WebBilling`. The `purchases_dart` package follows closely the native APIs from `purchases_flutter`.
 
 ## Usage
 
