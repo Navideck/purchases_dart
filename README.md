@@ -11,7 +11,7 @@ Before using `PurchasesDart`, you must configure it with `PurchasesDartConfigura
 ```dart
 await PurchasesDart.configure(
   PurchasesDartConfiguration(
-    apiKey: WEb_BILLING_API_KEY,
+    apiKey: WEB_BILLING_API_KEY,
     appUserId: userId,
   ),
 );
