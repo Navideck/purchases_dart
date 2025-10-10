@@ -1,23 +1,18 @@
 name: example
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.2.5 <4.0.0'
+  sdk: ">=3.2.5 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.2.4
   purchases_flutter:
-  purchases_dart: ^1.0.0
-  purchases_dart_stripe:
-    path: ../packages/purchases_dart_stripe
-
-dependency_overrides:
   purchases_dart:
-    path: ../packages/purchases_dart
+    path: ../
 
 dev_dependencies:
   flutter_test:
