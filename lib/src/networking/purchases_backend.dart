@@ -24,9 +24,6 @@ class PurchasesBackend {
   PurchasesBackend({
     required String apiKey,
   }) {
-    if (!isWebBillingApiKey(apiKey)) {
-      throw Exception("web billing api key is not valid");
-    }
     isSandbox = isWebBillingSandboxApiKey(apiKey);
     _httpClient = Dio(
       BaseOptions(
