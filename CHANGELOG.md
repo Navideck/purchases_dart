@@ -1,9 +1,9 @@
 ## 2.0.0
-* Breaking changes:
-* Now using `webBilling`, no more stripe configurations
-* `purchase` api removed, use `getWebBillingUrl` to make purchases
-* Removed storeProduct from configs, and config now only support Web billing api key
-* Removed `purchases_dart_stripe` support
+Breaking changes:
+* Now using `webBilling`, no more Stripe configurations needed
+* Remove `purchase` API. Add `getWebBillingUrl` for making purchases
+* Remove storeProduct from configs. Config now only support Web billing API key
+* Remove `purchases_dart_stripe` support
 
 ## 1.0.5
 * Bump purchases_flutter
