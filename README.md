@@ -31,21 +31,34 @@ await PurchasesDart.getOfferings();
 
 ### Purchase package
 
-Make sure the WebBillingUrl is configured for the package in Revenuecat dashboard
+#### Step 1: Configure WebBillingUrl in RevenueCat Dashboard
 
-then get the WebBillingUrl using
+Before making purchases, you must configure WebBillingUrl for each offering in the RevenueCat dashboard:
+
+1. Navigate to the **Web** section of your RevenueCat dashboard
+2. For each offering, select **+ Create web purchase link** to generate the WebBillingUrl
+
+**Optional: Configure deep linking for post-purchase redirect**
+
+To redirect users back to your app after a successful purchase:
+
+1. In the WebBillingUrl configuration, go to the **Success** section
+2. Choose **Redirect to a custom success page**
+3. Set a URL that can open your app using a deep link
+4. Configure deep link handling in your app using [app_links](https://pub.dev/packages/app_links)
+
+#### Step 2: Get and launch the WebBillingUrl
+
+Retrieve the WebBillingUrl for a package and launch it in the user's browser:
 
 ```dart
-await PurchasesDart.getWebBillingUrl(package);
+Uri? webBillingUrl = await PurchasesDart.getWebBillingUrl(
+  package,
+  email: userEmail, // Optional: pre-fill the user's email
+);
 ```
 
-launch the url in browser using `url_launcher`
-
-To get back to the app:
-
-set a success page url to this `WebBillingUrl` config, which can open your app using deep link
-
-use [app_links](https://pub.dev/packages/app_links) to configure deep link in your app
+launch the `webBillingUrl` in browser using [url_launcher](https://pub.dev/packages/url_launcher)
 
 ## Important Notes
 
