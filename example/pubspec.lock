@@ -254,7 +254,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.6"
+    version: "2.0.0"
   purchases_flutter:
     dependency: "direct main"
     description:
