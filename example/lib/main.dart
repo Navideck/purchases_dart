@@ -82,7 +82,7 @@ class _MainAppState extends State<MainApp> {
   void _purchasePackage(Package package) async {
     setState(() => isLoading = true);
     try {
-      Uri? webBillingUrl = await PurchasesDart.getWebBillingUrl(
+      Uri? webBillingUrl = await PurchasesDart.getWebCheckoutUrl(
         package,
         //  email: "testuser@gmail.com",
       );

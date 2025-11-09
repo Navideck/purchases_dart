@@ -68,7 +68,7 @@ class PurchasesBackend {
     return await _offeringParser?.createOfferings(rawOfferings, rawProducts);
   }
 
-  Future<({Uri? production, Uri? sandbox})?> getWebBillingUrl(
+  Future<({Uri? production, Uri? sandbox})?> getWebCheckoutUrl(
       String userId, Package package) async {
     final rawOfferings = await getRawOfferings(userId);
     String offeringId = package.presentedOfferingContext.offeringIdentifier;

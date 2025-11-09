@@ -111,12 +111,12 @@ class PurchasesDart {
   ///
   /// [package] The Package you wish to get the web billing url for
   /// [email] The email of the user you wish to purchase the package for
-  static Future<Uri?> getWebBillingUrl(
+  static Future<Uri?> getWebCheckoutUrl(
     Package package, {
     String? email,
   }) async {
     String userId = _validateConfigAndGetUserId();
-    var urls = await _backend?.getWebBillingUrl(userId, package);
+    var urls = await _backend?.getWebCheckoutUrl(userId, package);
     Uri? resultUrl = urls?.production;
     if (_backend?.isSandbox == true && urls?.sandbox != null) {
       resultUrl = urls?.sandbox;

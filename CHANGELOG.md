@@ -1,8 +1,8 @@
 ## 2.0.0
 Breaking changes:
-* Now using `webBilling`, no more Stripe configurations needed
-* Remove `purchase` API. Add `getWebBillingUrl` for making purchases
-* Remove storeProduct from configs. Config now only support Web billing API key
+* Now using RevenueCat Web Billing. Stripe configuration is no longer needed
+* Remove `purchase` API. Add `getWebCheckoutUrl` for making purchases
+* Remove storeProduct from configs. Config now only support Web Billing API key
 * Remove `purchases_dart_stripe` support
 
 ## 1.0.5
