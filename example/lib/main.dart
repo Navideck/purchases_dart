@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'package:example/env.dart' as env;
 import 'package:flutter/material.dart';
 import 'package:purchases_dart/purchases_dart.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
@@ -35,7 +34,7 @@ class _MainAppState extends State<MainApp> {
     // configure PurchasesDart
     await PurchasesDart.configure(
       PurchasesDartConfiguration(
-        webBillingApiKey: env.webBillingApiKey,
+        webBillingApiKey: , // Fill with your web billing api key
       ),
     );
 
