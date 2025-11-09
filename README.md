@@ -39,16 +39,7 @@ await PurchasesDart.getOfferings();
 
 #### Step 1: Configure Web Purchase Link in RevenueCat Dashboard
 
-Before making purchases, you must configure a [Web Purchase Link](https://www.revenuecat.com/docs/web/web-billing/web-purchase-links#creating-a-web-purchase-link) for each offering in the RevenueCat dashboard.
-
-**Optional: Configure Deep Linking for Post-Purchase Redirect**
-
-To redirect users back to your app after a successful purchase:
-
-1. In the Web Purchase Link configuration, go to the **Success** section
-2. Choose **Redirect to a custom success page**
-3. Set a URL that can open your app using a deep link
-4. Configure deep link handling in your app using [app_links](https://pub.dev/packages/app_links)
+In order to make purchases, you need a `webCheckoutUrl`. In order to have webCheckoutUrl populated, you need to create a Web Purchase Link for your offering. Here are the [docs](https://www.revenuecat.com/docs/web/web-billing/web-purchase-links#creating-a-web-purchase-link) that explain how to do that.
 
 #### Step 2: Get and Launch the Web Purchase Link
 
@@ -66,3 +57,13 @@ if (webCheckoutUrl != null) {
 ```
 
 Make sure to import and use the [url_launcher](https://pub.dev/packages/url_launcher) package to launch the URL.
+
+
+#### Step 3 (Optional): Configure Deep Linking for Post-Purchase Redirect
+
+To redirect users back to your app after a successful purchase:
+
+1. In the Web Purchase Link configuration, go to the **Success** section
+2. Choose **Redirect to a custom success page**
+3. Set a URL that can open your app using a deep link
+4. Configure deep link handling in your app using [app_links](https://pub.dev/packages/app_links)
