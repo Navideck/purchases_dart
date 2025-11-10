@@ -67,3 +67,13 @@ To redirect users back to your app after a successful purchase:
 2. Choose **Redirect to a custom success page**
 3. Set a URL that can open your app using a deep link
 4. Configure deep link handling in your app using [app_links](https://pub.dev/packages/app_links)
+
+## 🧩 Apps using Purchases Dart
+
+Here are some of the apps leveraging the power of `purchases_dart` in production:
+
+| <img src="assets/bt_cam_icon.svg" alt="BT Cam Icon" width="224" height="224"> | [**BT Cam**](https://btcam.app)<br>A Bluetooth remote app for DSLR and mirrorless cameras. Compatible with Canon, Nikon, Sony, Fujifilm, GoPro, Olympus, Panasonic, Pentax, and Blackmagic. Built using Purchases Dart to enable app purchases across iOS, Android, macOS, Windows, Linux & Web. |
+|:--:|:--|
+> 💡 **Built something cool with Purchases Dart?**  
+> We'd love to showcase your app here!  
+> Open a pull request and add it to this section. Please include your app icon in svg!
