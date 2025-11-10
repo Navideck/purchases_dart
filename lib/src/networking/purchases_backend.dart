@@ -11,7 +11,9 @@ import '../parser/offering_parser.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Backend for Purchases.
-/// This class handles all the network requests.
+///
+/// This class handles all network requests to the RevenueCat API,
+/// including customer info retrieval, offerings, and web checkout URL generation.
 class PurchasesBackend {
   late Dio _httpClient;
   OfferingParser? _offeringParser;
@@ -21,6 +23,9 @@ class PurchasesBackend {
   final String _rcBillingBaseUrl = 'https://api.revenuecat.com/rcbilling/v1';
   late final bool isSandbox;
 
+  /// Creates a [PurchasesBackend] instance with the given API key.
+  ///
+  /// [apiKey] The RevenueCat Web Billing API key used for authentication.
   PurchasesBackend({
     required String apiKey,
   }) {
