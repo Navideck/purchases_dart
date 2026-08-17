@@ -34,7 +34,7 @@ class _MainAppState extends State<MainApp> {
     // configure PurchasesDart
     await PurchasesDart.configure(
       PurchasesDartConfiguration(
-        webBillingApiKey: , // Fill with your web billing api key
+        webBillingApiKey: "", // TODO Fill in your web billing api key
       ),
     );
 
