@@ -1,3 +1,8 @@
+## 2.1.0
+* Bump purchases_flutter to 10.9.0
+* Flutter 3.47.0 updates
+
+
 ## 2.0.0
 Breaking changes:
 * Now using RevenueCat Web Billing. Stripe configuration is no longer needed
