@@ -81974,7 +81974,7 @@ for(;;)switch(s){case 0:m=J.b8(a)
 l=A.bq(m.h(a,"apiKey"))
 if(l==null)throw A.f(A.lU($.apL(),null,"API key is required",null))
 p=t.N
-o=A.ab(["apiKey",l,"flavor","flutter","flavorVersion","10.9.0"],p,p)
+o=A.ab(["apiKey",l,"flavor","flutter","flavorVersion","10.9.1"],p,p)
 n=A.bq(m.h(a,"appUserId"))
 if(n!=null&&n.length!==0)o.m(0,"appUserId",n)
 q.qX("configure",[o])
