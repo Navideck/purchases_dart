@@ -155,7 +155,7 @@ class PurchasesDart {
   ///
   /// [attributes] Map of attributes by key. Set the value as an empty string to delete an attribute.
   /// This wont sync automatically when userId changes..
-  Future<void> setAttributionID(Map<String, String> attributes) async {
+  static Future<void> setAttributes(Map<String, String> attributes) async {
     String userId = _validateConfigAndGetUserId();
     await _attributeManager.setAttributes(
       userId,

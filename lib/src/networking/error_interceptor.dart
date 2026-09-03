@@ -64,10 +64,6 @@ class ErrorInterceptor extends Interceptor {
       case DioExceptionType.cancel:
       case DioExceptionType.unknown:
         return handler.reject(err);
-      case DioExceptionType.transformTimeout:
-        return handler.reject(
-          TransformTimeOutException(err.requestOptions),
-        );
     }
   }
 }
@@ -118,17 +114,6 @@ class ReceiveTimeOutException extends DioException {
   @override
   String toString() {
     return 'Receive Timed out, Please try again';
-  }
-}
-
-/// Exception thrown when a transform timeout occurs.
-class TransformTimeOutException extends DioException {
-  /// Creates a [TransformTimeOutException] with the given request options.
-  TransformTimeOutException(RequestOptions r) : super(requestOptions: r);
-
-  @override
-  String toString() {
-    return 'Transform Timed out, Please try again';
   }
 }
 
