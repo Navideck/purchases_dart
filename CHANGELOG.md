@@ -1,4 +1,5 @@
 ## 2.1.0
+* Expose `setAttributes` api
 * Bump purchases_flutter to 10.9.0
 * Flutter 3.47.0 updates
 
