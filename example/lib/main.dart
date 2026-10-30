@@ -104,17 +104,12 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
-  Future<void> loginUser() async {
+  Future<void> updateAppUserId() async {
     try {
-      LogInResult? logInResult = await PurchasesDart.login(
+      await PurchasesDart.updateAppUserId(
         _userIdController.text,
       );
-      print(
-        'LogInResult: Created: ${logInResult.created} | Customer: ${logInResult.customerInfo}',
-      );
-      setState(() {
-        customerInfo = logInResult.customerInfo;
-      });
+      _getCustomerInfo();
     } catch (e) {
       print(e);
     }
@@ -155,8 +150,8 @@ class _MainAppState extends State<MainApp> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: loginUser,
-                    child: const Text("Login"),
+                    onPressed: updateAppUserId,
+                    child: const Text("UpdateApp UserId"),
                   ),
                   ElevatedButton(
                     onPressed: logoutUser,
