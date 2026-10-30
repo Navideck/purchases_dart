@@ -1,5 +1,9 @@
 # PurchasesDart
 
+<div align="center">
+  <img src="assets/purchases-dart-banner-r1.png" alt="Purchases Dart — Purchase and subscription APIs for Dart" width="100%">
+</div>
+
 `PurchasesDart` is a Dart implementation of the [purchases_flutter](https://pub.dev/packages/purchases_flutter) plugin, designed to facilitate in-app purchases and subscriptions with Web Billing. The `purchases_dart` package closely follows the native APIs from `purchases_flutter`.
 
 ## Usage
