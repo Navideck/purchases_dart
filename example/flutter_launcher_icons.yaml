@@ -1,0 +1,15 @@
+flutter_launcher_icons:
+  image_path: "../assets/purchases-dart-launcher-r1.png"
+  android: true
+  adaptive_icon_background: "#F5F7FA"
+  adaptive_icon_foreground: "../assets/purchases-dart-icon-r1.png"
+  adaptive_icon_foreground_inset: 16
+  ios: true
+  remove_alpha_ios: true
+  background_color_ios: "#F5F7FA"
+  web:
+    generate: true
+    background_color: "#F5F7FA"
+    theme_color: "#F5F7FA"
+  macos:
+    generate: true
