@@ -1,5 +1,11 @@
 ## 2.2.0
 * Add support for Virtual Currencies APIs (`getVirtualCurrencies`, `getCachedVirtualCurrencies`, `invalidateVirtualCurrenciesCache`)
+* Add virtual currency API support with response parsing, caching, and tests.
+* Export `ReservedSubscriberAttribute` publicly.
+* Add Appstack attribution support through `$appstackId`.
+* Populate `latestExpirationDate` from the customer’s expiration dates.
+* Wrap subscriber attributes in the expected attributes request payload (fixes `setAttributes`).
+* Correctly map subscription periods and micros-based product prices.
 
 ## 2.1.0
 * Expose `setAttributes` api
