@@ -1,3 +1,6 @@
+## 2.2.0
+* Add support for Virtual Currencies APIs (`getVirtualCurrencies`, `getCachedVirtualCurrencies`, `invalidateVirtualCurrenciesCache`)
+
 ## 2.1.0
 * Expose `setAttributes` api
 * Bump purchases_flutter to 10.9.0
