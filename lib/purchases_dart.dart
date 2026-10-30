@@ -3,5 +3,6 @@ export 'src/networking/purchases_backend.dart';
 export 'src/model/purchases_header.dart';
 export 'src/model/raw_customer.dart';
 export 'src/model/raw_offerings.dart';
+export 'src/model/subscribe_attributes_key.dart';
 export 'src/purchases_dart_configuration.dart';
 export 'src/purchases_dart.dart';

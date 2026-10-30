@@ -1,8 +1,9 @@
+import 'package:purchases_flutter/purchases_flutter.dart';
+
 import '../helper/currency_formatter.dart';
 import '../helper/extensions.dart';
 import '../model/raw_offerings.dart';
 import '../model/raw_product.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Parses a [RawOffering] into a [Offerings] object.
 class OfferingParser {
@@ -102,7 +103,10 @@ class OfferingParser {
 
     if (productPrice == null) return null;
 
-    double? price = productPrice.amount?.toDouble();
+    double? price = productPrice.amountMicros != null
+        ? productPrice.amountMicros! / 1000000
+        : productPrice.amount?.toDouble();
+
     String? currency = productPrice.currency;
 
     if (price == null || currency == null) {
@@ -123,6 +127,9 @@ class OfferingParser {
         currency,
         presentedOfferingContext: offeringContext,
         productCategory: productCategory,
+        subscriptionPeriod: productCategory == ProductCategory.subscription
+            ? rawProduct.normalPeriodDuration
+            : null,
       ),
       offeringContext,
     );

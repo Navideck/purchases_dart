@@ -1,3 +1,5 @@
+import 'package:purchases_flutter/purchases_flutter.dart';
+
 import 'helper/attributes_manager.dart';
 import 'helper/cache_manager.dart';
 import 'helper/identity_manager.dart';
@@ -7,8 +9,8 @@ import 'model/raw_customer.dart';
 import 'model/subscribe_attributes_key.dart';
 import 'networking/purchases_backend.dart';
 import 'parser/customer_parser.dart';
+import 'parser/virtual_currencies_parser.dart';
 import 'purchases_dart_configuration.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Entry point for PurchasesDart.
 class PurchasesDart {
@@ -69,11 +71,39 @@ class PurchasesDart {
   static Future<Offerings?> getOfferings({
     PurchasesHeader? headers,
   }) async {
-    String userId = _validateConfigAndGetUserId();
     return await _backend?.getOfferings(
-      userId,
+      _validateConfigAndGetUserId(),
       headers: headers,
     );
+  }
+
+  /// Fetches the virtual currencies for the current subscriber.
+  static Future<VirtualCurrencies> getVirtualCurrencies({
+    PurchasesHeader? headers,
+  }) async {
+    final userId = _validateConfigAndGetUserId();
+    final currencies =
+        await _backend!.getVirtualCurrencies(userId, headers: headers);
+
+    await _cacheManager
+        .virtualCurrencies(userId)
+        .setCached(currencies.toJson());
+    return currencies;
+  }
+
+  /// Returns the cached virtual currencies, or null if they have not been fetched.
+  static Future<VirtualCurrencies?> getCachedVirtualCurrencies() async {
+    final userId = _validateConfigAndGetUserId();
+    final cached = _cacheManager.virtualCurrencies(userId).getCached();
+
+    return cached == null ? null : VirtualCurrencies.fromJson(cached);
+  }
+
+  /// Invalidates the cached virtual currencies for the current subscriber.
+  static Future<void> invalidateVirtualCurrenciesCache() async {
+    await _cacheManager
+        .virtualCurrencies(_validateConfigAndGetUserId())
+        .invalidate();
   }
 
   /// This function will logIn the current user with an appUserID.

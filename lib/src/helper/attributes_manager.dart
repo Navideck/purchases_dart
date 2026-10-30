@@ -1,5 +1,4 @@
 import '../../purchases_dart.dart';
-import '../model/subscribe_attributes_key.dart';
 
 class AttributeManager {
   final PurchasesBackend backend;

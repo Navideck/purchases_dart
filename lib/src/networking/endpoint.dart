@@ -11,7 +11,8 @@ class Endpoint {
       this is LogIn ||
       this is PostReceipt ||
       this is GetOfferings ||
-      this is GetProductEntitlementMapping;
+      this is GetProductEntitlementMapping ||
+      this is GetVirtualCurrencies;
 
   bool needsNonceToPerformSigning() =>
       this is GetCustomerInfo || this is LogIn || this is PostReceipt;
@@ -39,6 +40,16 @@ class GetOfferings extends Endpoint {
       : super(
           "/subscribers/${Uri.encodeComponent(userId)}/offerings",
           "get_offerings",
+        );
+}
+
+class GetVirtualCurrencies extends Endpoint {
+  final String userId;
+
+  GetVirtualCurrencies(this.userId)
+      : super(
+          "/subscribers/${Uri.encodeComponent(userId)}/virtual_currencies",
+          "get_virtual_currencies",
         );
 }
 

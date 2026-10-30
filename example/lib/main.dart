@@ -31,10 +31,16 @@ class _MainAppState extends State<MainApp> {
   Future<void> _initialize() async {
     PurchasesDart.setLogLevel(LogLevel.verbose);
 
+    const envApiKey = String.fromEnvironment('WEB_BILLING_API_KEY');
+    final apiKey = envApiKey.isNotEmpty
+        ? envApiKey
+        // TODO: Add your api key
+        : "";
+
     // configure PurchasesDart
     await PurchasesDart.configure(
       PurchasesDartConfiguration(
-        webBillingApiKey: "", // TODO Fill in your web billing api key
+        webBillingApiKey: apiKey,
       ),
     );
 
@@ -98,17 +104,12 @@ class _MainAppState extends State<MainApp> {
     }
   }
 
-  Future<void> loginUser() async {
+  Future<void> updateAppUserId() async {
     try {
-      LogInResult? logInResult = await PurchasesDart.login(
+      await PurchasesDart.updateAppUserId(
         _userIdController.text,
       );
-      print(
-        'LogInResult: Created: ${logInResult.created} | Customer: ${logInResult.customerInfo}',
-      );
-      setState(() {
-        customerInfo = logInResult.customerInfo;
-      });
+      _getCustomerInfo();
     } catch (e) {
       print(e);
     }
@@ -149,8 +150,8 @@ class _MainAppState extends State<MainApp> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton(
-                    onPressed: loginUser,
-                    child: const Text("Login"),
+                    onPressed: updateAppUserId,
+                    child: const Text("UpdateApp UserId"),
                   ),
                   ElevatedButton(
                     onPressed: logoutUser,
@@ -171,6 +172,22 @@ class _MainAppState extends State<MainApp> {
                   ElevatedButton(
                     onPressed: _getOfferings,
                     child: const Text("Get Offerings"),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () async {
+                      print(
+                          "Currencies: ${await PurchasesDart.getVirtualCurrencies()}");
+                    },
+                    child: const Text("Get Virtual Currencies"),
                   ),
                 ],
               ),

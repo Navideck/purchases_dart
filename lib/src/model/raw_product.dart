@@ -125,6 +125,7 @@ class ProductPurchaseOption {
 
   Map<String, dynamic> toJson() => {
         "base": base?.toJson(),
+        "base_price": basePrice?.toJson(),
         "id": id,
         "intro_price": introPrice,
         "price_id": priceId,

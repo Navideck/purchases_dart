@@ -1,10 +1,10 @@
+import 'package:purchases_flutter/purchases_flutter.dart';
+
 import '../helper/date_helper.dart';
 import '../helper/enum_parser.dart';
 import '../helper/extensions.dart';
 import '../helper/logger.dart';
 import '../model/raw_customer.dart';
-
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Parses a [RawCustomer] into a [CustomerInfo] object.
 class CustomerParser {
@@ -74,12 +74,28 @@ class CustomerParser {
       originalAppUserId,
       allExpirationDates,
       rawCustomer.requestDate,
-      latestExpirationDate: null,
+      latestExpirationDate: _getLatestExpiryDate(allExpirationDates),
       originalPurchaseDate: rawCustomer.originalPurchaseDate?.toString(),
       originalApplicationVersion:
           rawCustomer.originalApplicationVersion?.toString(),
       managementURL: rawCustomer.managementUrl,
     );
+  }
+
+  String? _getLatestExpiryDate(Map<String, String?> expirationDates) {
+    DateTime? latestDate;
+
+    for (final expiryDate in expirationDates.values.whereType<String>()) {
+      final parsedDate = DateTime.tryParse(expiryDate);
+
+      if (parsedDate == null) continue;
+
+      if (latestDate == null || parsedDate.isAfter(latestDate)) {
+        latestDate = parsedDate;
+      }
+    }
+
+    return latestDate?.toString();
   }
 
   EntitlementInfos _createEntitlementInfos({

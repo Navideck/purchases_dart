@@ -21,6 +21,7 @@ class ReservedSubscriberAttribute {
 
   // Attribution IDs
   static const ADJUST_ID = ReservedSubscriberAttribute._("\$adjustId");
+  static const APPSTACK_ID = ReservedSubscriberAttribute._("\$appstackId");
   static const APPSFLYER_ID = ReservedSubscriberAttribute._("\$appsflyerId");
   static const FB_ANON_ID = ReservedSubscriberAttribute._("\$fbAnonId");
   static const MPARTICLE_ID = ReservedSubscriberAttribute._("\$mparticleId");
